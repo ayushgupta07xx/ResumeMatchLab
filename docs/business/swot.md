@@ -24,7 +24,7 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 - **No recruiter-side validation.** Nothing in the loop confirms that a higher-scoring resume actually performs better with real recruiters or ATS systems — the tool optimizes for market-text similarity, not verified recruiter behaviour.
 - **Statistical rigor can intimidate non-technical users.** Anjali (the fresher) does not want a forest plot; if the plain-language layer is weak, the rigor becomes a usability liability rather than an asset.
 - **Cold-start dependency on the user.** Output quality depends entirely on the user supplying two *meaningfully different* variants; near-identical uploads produce an honest but anticlimactic "effectively tied" verdict.
-- **Platform and model constraints.** Streamlit Community Cloud limits compute and concurrency, and the small 384-dim model trades some semantic nuance for speed — fine for a portfolio app, a ceiling for scale.
+- **Platform and model constraints.** Streamlit Community Cloud limits compute and concurrency, and the small 384-dim model trades some semantic nuance for speed — fine for the current scope, a ceiling for scale.
 
 > **Strategic implication.** The biggest risk is over-claiming. Frame the score honestly as a *market-fit signal*, surface limitations in the UI, and refresh the corpus on a stated cadence. Treating the proxy gap transparently is itself a credibility signal; hiding it would be the real failure.
 
@@ -37,7 +37,7 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 - **B2B pivot to institutions.** Campus placement cells and corporate HR/L&D could license a cohort version (batch scoring, anonymized cluster analytics) — a far larger contract value than individual freemium.
 - **Corpus as a recurring asset.** Periodic refreshes and trend reporting ("Data & Analytics demand rose this quarter") create a content and SEO engine and a reason for users to return.
 - **Natural freemium ladder.** Free single A/B test → paid deeper drill-down, history, and unlimited reruns → institutional tier maps cleanly onto the three personas' willingness to pay.
-- **Methodology as portfolio and thought-leadership content.** The rigor itself (CUPED, mSPRT, FDR) is publishable material that drives credibility and inbound interest.
+- **Methodology as thought-leadership content.** The rigor itself (CUPED, mSPRT, FDR) is publishable material that drives credibility and inbound interest.
 
 > **Strategic implication.** The clearest path to durable value is institutional (placement cells, HR) where cohort-level cluster analytics justify a real contract, while the free consumer app remains the top-of-funnel demand and credibility engine. Sequence: nail the consumer experience, then package the same engine for cohorts.
 

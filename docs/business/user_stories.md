@@ -176,4 +176,4 @@ Twelve user stories for ResumeMatch Lab, written against the three personas defi
 ### Suggested release slicing
 - **MVP (Must, 24 pts):** US-1, US-2, US-3, US-4, US-7, US-10 — a complete, trustworthy, free A/B test with cluster breakdown and privacy.
 - **v1.1 (Should, 26 pts):** US-5, US-6, US-8, US-9, US-11 — the statistical-rigor layer that wins over Rohit and Sneha.
-- **v1.2 (Could, 5 pts):** US-12 — shareable PDF artefact for portfolio and offline iteration.
+- **v1.2 (Could, 5 pts):** US-12 — shareable PDF artefact for record-keeping and offline iteration.

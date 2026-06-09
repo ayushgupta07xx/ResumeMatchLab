@@ -9,7 +9,7 @@ project JobAtlas already has ~9,000 deduplicated Indian tech jobs embedded with
 **Decision.** Export 2,000 active, non-duplicate jobs *with their existing vectors* into
 committed Parquet (`scripts/export_from_jobatlas.py`).
 **Consequences.** Real data, zero re-embedding of the corpus, and — crucially — the two
-portfolio projects share one job universe and identical vectors (consistency story). The app
+products share one job universe and identical vectors (consistency story). The app
 ships the snapshot and runs fully offline.
 
 ## ADR-2: BGE-small, normalized, no instruction prefix
@@ -24,7 +24,7 @@ a single fast matrix-vector product. 384-dim keeps it light on free-tier CPU.
 **Context.** The product needs a UI fast, hosted free.
 **Decision.** Streamlit + Streamlit Community Cloud; Next.js deferred as a stretch.
 **Consequences.** Days of frontend work compress to hours; Python-native (no API boundary);
-free hosting. Trade-off: less pixel control, accepted for a portfolio analytics product.
+free hosting. Trade-off: less pixel control, accepted for an analytics product.
 
 ## ADR-4: Paired design with a normality-gated test
 **Context.** Every job is scored by both resumes.

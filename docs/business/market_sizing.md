@@ -7,7 +7,7 @@ A TAM / SAM / SOM estimate for ResumeMatch Lab in the Indian resume-tooling and 
 > ### How to read this document
 > - **TAM** = the total value if every relevant job seeker in India used a paid resume tool.
 > - **SAM** = the slice ResumeMatch can realistically serve (online, tech-leaning, willing to engage with a digital resume tool).
-> - **SOM** = the share a small, free, portfolio-stage product could plausibly capture in 2–3 years.
+> - **SOM** = the share a small, free, early-stage product could plausibly capture in 2–3 years.
 
 ---
 

@@ -50,7 +50,7 @@ publishable-quality writeup with derivations, design choices, and references.
 
 The 2,000-job corpus and its 384-dim embeddings are exported directly from the author's
 sibling project **[JobAtlas](../JobAtlas)** — the same `BAAI/bge-small-en-v1.5` vectors,
-the same job universe. This makes the two portfolio projects *consistent by construction*
+the same job universe. This makes the two products *consistent by construction*
 and lets ResumeMatch ship a pre-embedded snapshot so it runs **fully offline**.
 
 ```
