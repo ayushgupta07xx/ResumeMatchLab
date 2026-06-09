@@ -40,8 +40,11 @@ def per_cluster_analysis(
         else:
             rec.update(
                 mean_delta=float(np.mean(sub)) if len(sub) else float("nan"),
-                t_stat=float("nan"), p_raw=float("nan"),
-                ci_low=float("nan"), ci_high=float("nan"), cohens_d=float("nan"),
+                t_stat=float("nan"),
+                p_raw=float("nan"),
+                ci_low=float("nan"),
+                ci_high=float("nan"),
+                cohens_d=float("nan"),
             )
         records.append(rec)
 

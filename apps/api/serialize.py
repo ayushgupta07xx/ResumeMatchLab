@@ -27,20 +27,22 @@ def report_to_dict(report, scoring, resume_a=None, resume_b=None) -> dict:
 
     clusters = []
     for _, r in report.per_cluster.iterrows():
-        clusters.append({
-            "cluster_id": int(r["cluster_id"]),
-            "label": str(r["label"]),
-            "n": int(r["n"]),
-            "mean_delta": _f(r["mean_delta"]),
-            "ci_low": _f(r["ci_low"]),
-            "ci_high": _f(r["ci_high"]),
-            "p_raw": _f(r["p_raw"]),
-            "p_bonferroni": _f(r["p_bonferroni"]),
-            "p_bh_fdr": _f(r["p_bh_fdr"]),
-            "sig_bonferroni": bool(r["sig_bonferroni"]),
-            "sig_bh": bool(r["sig_bh"]),
-            "winner": str(r["winner"]),
-        })
+        clusters.append(
+            {
+                "cluster_id": int(r["cluster_id"]),
+                "label": str(r["label"]),
+                "n": int(r["n"]),
+                "mean_delta": _f(r["mean_delta"]),
+                "ci_low": _f(r["ci_low"]),
+                "ci_high": _f(r["ci_high"]),
+                "p_raw": _f(r["p_raw"]),
+                "p_bonferroni": _f(r["p_bonferroni"]),
+                "p_bh_fdr": _f(r["p_bh_fdr"]),
+                "sig_bonferroni": bool(r["sig_bonferroni"]),
+                "sig_bh": bool(r["sig_bh"]),
+                "winner": str(r["winner"]),
+            }
+        )
 
     lo = float(min(scoring.scores_a.min(), scoring.scores_b.min()))
     hi = float(max(scoring.scores_a.max(), scoring.scores_b.max()))
@@ -67,8 +69,10 @@ def report_to_dict(report, scoring, resume_a=None, resume_b=None) -> dict:
             "p_value": _f(v.p_value),
             "cohens_d": _f(v.cohens_d),
         },
-        "summary": {**{k: _f(val) for k, val in report.scores_summary.items()},
-                    "n_jobs": report.n_jobs},
+        "summary": {
+            **{k: _f(val) for k, val in report.scores_summary.items()},
+            "n_jobs": report.n_jobs,
+        },
         "tests": {
             "primary": {
                 "name": report.primary_test.name,
@@ -120,8 +124,9 @@ def report_to_dict(report, scoring, resume_a=None, resume_b=None) -> dict:
             "posterior_mean": _f(report.bayes.mean),
             "credible_interval": [_f(report.bayes.ci_low), _f(report.bayes.ci_high)],
             "prob_b_beats_a": _f(report.bayes.prob_b_beats_a),
-            "posterior_curve": [{"p": float(x), "density": float(y)}
-                                for x, y in zip(xs, pdf, strict=True)],
+            "posterior_curve": [
+                {"p": float(x), "density": float(y)} for x, y in zip(xs, pdf, strict=True)
+            ],
         },
         "distributions": {
             "bin_centers": [float(c) for c in centers],

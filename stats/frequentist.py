@@ -31,8 +31,9 @@ def shapiro_normality(deltas: np.ndarray) -> TestResult:
         rng = np.random.default_rng(RNG_SEED)
         sample = rng.choice(d, 5000, replace=False)
     if len(sample) < 3:
-        return TestResult("Shapiro-Wilk normality", 0.0, 1.0,
-                          detail={"normal_at_05": True, "n_used": len(sample)})
+        return TestResult(
+            "Shapiro-Wilk normality", 0.0, 1.0, detail={"normal_at_05": True, "n_used": len(sample)}
+        )
     w, p = stats.shapiro(sample)
     return TestResult(
         name="Shapiro-Wilk normality",
@@ -69,10 +70,12 @@ def wilcoxon_signed_rank(deltas: np.ndarray) -> TestResult:
     d = np.asarray(deltas, dtype=float)
     nz = d[d != 0]
     if len(nz) == 0:
-        return TestResult("Wilcoxon signed-rank", 0.0, 1.0,
-                          detail={"note": "all deltas zero", "n_nonzero": 0})
-    res = stats.wilcoxon(nz, zero_method="wilcox", correction=False,
-                         alternative="two-sided", method="auto")
+        return TestResult(
+            "Wilcoxon signed-rank", 0.0, 1.0, detail={"note": "all deltas zero", "n_nonzero": 0}
+        )
+    res = stats.wilcoxon(
+        nz, zero_method="wilcox", correction=False, alternative="two-sided", method="auto"
+    )
     return TestResult(
         name="Wilcoxon signed-rank",
         statistic=float(res.statistic),

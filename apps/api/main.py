@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="ResumeMatch Lab API",
     version="1.0.0",
-    description="A/B test two resume variants against 2,000 Indian tech jobs.",
+    description="A/B test two resume variants against the full Indian tech job corpus.",
     lifespan=lifespan,
 )
 
@@ -63,7 +63,7 @@ def _run(a: ResumeText, b: ResumeText) -> dict:
         raise HTTPException(
             status_code=422,
             detail=f"A resume parsed to under {MIN_SCORABLE_CHARS} characters; "
-                   "cannot score. Please provide fuller text.",
+            "cannot score. Please provide fuller text.",
         )
     corpus = load_corpus()
     scoring = compare_resumes(a, b, corpus)

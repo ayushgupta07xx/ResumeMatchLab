@@ -8,7 +8,7 @@ alternative mean. The mixture likelihood ratio after n observations is
 
 and p_n = min(1, 1/Lambda_n) is an *always-valid* p-value: taking the running
 minimum lets you peek at any sample size without inflating Type I error. In the
-static-snapshot product all 2,000 jobs are scored at once, so this is shown as a
+static-snapshot product all jobs are scored at once, so this is shown as a
 "valid at any n" alternative p-value rather than an operational stopping rule.
 """
 

@@ -44,7 +44,12 @@ def beta_binomial(
     hi = float(stats.beta.ppf(1 - (1 - ci) / 2, post_a, post_b))
     prob_b = float(stats.beta.sf(0.5, post_a, post_b))  # P(p > 0.5)
     return BayesResult(
-        k=k, n=n, post_a=post_a, post_b=post_b,
+        k=k,
+        n=n,
+        post_a=post_a,
+        post_b=post_b,
         mean=float(post_a / (post_a + post_b)),
-        ci_low=lo, ci_high=hi, prob_b_beats_a=prob_b,
+        ci_low=lo,
+        ci_high=hi,
+        prob_b_beats_a=prob_b,
     )

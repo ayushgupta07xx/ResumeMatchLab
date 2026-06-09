@@ -100,8 +100,9 @@ def build_verdict(
             f"Resume {winner} wins by {abs(mean) * 100:.2f} points "
             f"(95% CI [{lo:.2f}, {hi:.2f}], p={p:.3g})."
         )
-    return Verdict(winner, mean, bootstrap.bca_low, bootstrap.bca_high, p,
-                   significant, d, conf, headline)
+    return Verdict(
+        winner, mean, bootstrap.bca_low, bootstrap.bca_high, p, significant, d, conf, headline
+    )
 
 
 def analyze(scoring: ScoringResult, corpus: JobCorpus) -> AnalysisReport:

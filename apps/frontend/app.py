@@ -1,6 +1,6 @@
 """ResumeMatch Lab — Streamlit app.
 
-Upload two resume variants, score both against 2,000 Indian tech jobs, and run a
+Upload two resume variants, score both against the full Indian tech job corpus, and run a
 full A/B test (frequentist + Bayesian + CUPED + mSPRT + per-cluster correction).
 """
 
@@ -30,7 +30,7 @@ VERDICT_BORDER = {"B": "#16a34a", "A": "#dc2626", "tie": "#9ca3af"}
 CONF_BADGE = {"high": "🟢 high", "moderate": "🟡 moderate", "low": "⚪ low"}
 
 
-@st.cache_resource(show_spinner="Loading 2,000-job corpus…")
+@st.cache_resource(show_spinner="Loading job corpus…")
 def get_corpus():
     return load_corpus()
 
@@ -59,29 +59,43 @@ def _read_input(upload, pasted: str, slot: str) -> ResumeText | None:
 def _guardrails(a: ResumeText, b: ResumeText) -> list[GuardrailFlag]:
     flags: list[GuardrailFlag] = []
     if a.char_count < MIN_SCORABLE_CHARS or b.char_count < MIN_SCORABLE_CHARS:
-        flags.append(GuardrailFlag(
-            "too_short",
-            f"A resume parsed to under {MIN_SCORABLE_CHARS} characters — scoring is refused.",
-            "block"))
+        flags.append(
+            GuardrailFlag(
+                "too_short",
+                f"A resume parsed to under {MIN_SCORABLE_CHARS} characters — scoring is refused.",
+                "block",
+            )
+        )
     longest = max(a.char_count, b.char_count, 1)
     if abs(a.char_count - b.char_count) / longest > 0.5:
-        flags.append(GuardrailFlag(
-            "length_disparity",
-            "The two resumes differ a lot in length — this can bias scores.", "warning"))
+        flags.append(
+            GuardrailFlag(
+                "length_disparity",
+                "The two resumes differ a lot in length — this can bias scores.",
+                "warning",
+            )
+        )
     set_a, set_b = set(a.skills), set(b.skills)
     union = set_a | set_b
     jaccard = len(set_a & set_b) / len(union) if union else 1.0
     if jaccard < 0.3:
-        flags.append(GuardrailFlag(
-            "skill_divergence",
-            "The two resumes share few skills — they may be different roles, not "
-            "A/B variants. Interpret the verdict accordingly.", "warning"))
+        flags.append(
+            GuardrailFlag(
+                "skill_divergence",
+                "The two resumes share few skills — they may be different roles, not "
+                "A/B variants. Interpret the verdict accordingly.",
+                "warning",
+            )
+        )
     for r, name in ((a, "A"), (b, "B")):
         if "low_quality_parse" in r.quality_flags:
-            flags.append(GuardrailFlag(
-                f"low_quality_{name}",
-                f"Resume {name} parsed with low quality — check the preview below.",
-                "warning"))
+            flags.append(
+                GuardrailFlag(
+                    f"low_quality_{name}",
+                    f"Resume {name} parsed with low quality — check the preview below.",
+                    "warning",
+                )
+            )
     return flags
 
 
@@ -93,11 +107,18 @@ def _input_panel() -> None:
         with col:
             st.markdown(f"**Resume {slot}**")
             up = st.file_uploader(
-                f"PDF, DOCX or TXT — Resume {slot}", type=["pdf", "docx", "txt"],
-                key=f"file_{slot}", label_visibility="collapsed")
+                f"PDF, DOCX or TXT — Resume {slot}",
+                type=["pdf", "docx", "txt"],
+                key=f"file_{slot}",
+                label_visibility="collapsed",
+            )
             with st.expander("…or paste text"):
-                pasted = st.text_area(f"Resume {slot} text", key=f"text_{slot}",
-                                      height=140, label_visibility="collapsed")
+                pasted = st.text_area(
+                    f"Resume {slot} text",
+                    key=f"text_{slot}",
+                    height=140,
+                    label_visibility="collapsed",
+                )
             out[slot] = (up, pasted)
     st.session_state._inputs = out
 
@@ -107,23 +128,43 @@ def _render_preview(a: ResumeText, b: ResumeText) -> None:
     for r, col, name in ((a, c1, "A"), (b, c2, "B")):
         with col:
             badge = "✅" if not r.quality_flags else "⚠️"
-            st.caption(f"{badge} Resume {name}: {r.char_count:,} chars · parsed by "
-                       f"{r.parser_used} · {len(r.skills)} skills detected")
+            st.caption(
+                f"{badge} Resume {name}: {r.char_count:,} chars · parsed by "
+                f"{r.parser_used} · {len(r.skills)} skills detected"
+            )
             with st.expander("Preview parsed text"):
                 st.text(r.text[:1200] + ("…" if len(r.text) > 1200 else ""))
 
 
-def _verdict_card(verdict) -> None:
+def _verdict_card(rep) -> None:
+    v = rep.verdict
+    s = rep.scores_summary
+    pct_b = s["pct_jobs_b_wins"]
+    if v.winner in ("A", "B"):
+        loser = "B" if v.winner == "A" else "A"
+        pct_win = (100 - pct_b) if v.winner == "A" else pct_b
+        win_mean = s["mean_a"] if v.winner == "A" else s["mean_b"]
+        lose_mean = s["mean_b"] if v.winner == "A" else s["mean_a"]
+        edge = (win_mean - lose_mean) / lose_mean * 100 if lose_mean else 0.0
+        lead = f"Resume {v.winner} is the stronger match"
+        detail = (
+            f"it out-scores {loser} on <b>{pct_win:.0f}% of {rep.n_jobs:,} jobs</b>, "
+            f"with a <b>{edge:.1f}% higher</b> average match score"
+        )
+    else:
+        lead = "It's effectively a tie"
+        detail = "neither résumé scores meaningfully higher across the corpus"
     st.markdown(
         f"""
-        <div style="background:{VERDICT_BG[verdict.winner]};
-        border-left:6px solid {VERDICT_BORDER[verdict.winner]};
+        <div style="background:{VERDICT_BG[v.winner]};
+        border-left:6px solid {VERDICT_BORDER[v.winner]};
         padding:18px 22px;border-radius:10px;margin:6px 0 14px 0;">
-          <div style="font-size:1.35rem;font-weight:700;color:#111827;">
-            {verdict.headline}</div>
-          <div style="margin-top:6px;color:#374151;">
-            Confidence: <b>{CONF_BADGE.get(verdict.confidence, verdict.confidence)}</b>
-            &nbsp;·&nbsp; Cohen's d = <b>{verdict.cohens_d:+.3f}</b></div>
+          <div style="font-size:1.3rem;font-weight:700;color:#111827;line-height:1.4;">
+            {lead} — {detail}.</div>
+          <div style="margin-top:8px;color:#374151;font-size:0.9rem;">
+            Confidence: <b>{CONF_BADGE.get(v.confidence, v.confidence)}</b>
+            &nbsp;·&nbsp; {v.headline}
+            &nbsp;·&nbsp; Cohen's d = <b>{v.cohens_d:+.3f}</b></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -131,36 +172,54 @@ def _verdict_card(verdict) -> None:
 
 
 def _methodology_panel(rep) -> None:
-    st.markdown(f"**Primary test:** {rep.primary_test.name} "
-                f"(chosen via Shapiro-Wilk normality gate, "
-                f"p={rep.normality.pvalue:.3g}).")
-    st.latex(r"d_i = \mathrm{score}_B(i) - \mathrm{score}_A(i), \qquad "
-             r"\hat{d} = \tfrac{1}{N}\sum_i d_i")
-    st.markdown("**Bootstrap** (10,000 resamples) gives percentile + BCa CIs. "
-                "**CUPED** residualizes deltas on job-side covariates:")
-    st.latex(r"\hat{d}^{\,\mathrm{adj}}_i = d_i - X_i^\top\hat{\beta} + \bar{d}, "
-             r"\qquad \text{var. reduction} = 1 - \frac{\mathrm{var}(d^{adj})}{\mathrm{var}(d)} = R^2")
-    st.markdown("**mSPRT** (Robbins mixture) yields an always-valid p-value; "
-                "**Beta-Binomial** gives the Bayesian posterior of P(B>A per job); "
-                "**Bonferroni/BH-FDR** correct the 8 per-cluster tests.")
+    st.markdown(
+        f"**Primary test:** {rep.primary_test.name} "
+        f"(chosen via Shapiro-Wilk normality gate, "
+        f"p={rep.normality.pvalue:.3g})."
+    )
+    st.latex(
+        r"d_i = \mathrm{score}_B(i) - \mathrm{score}_A(i), \qquad "
+        r"\hat{d} = \tfrac{1}{N}\sum_i d_i"
+    )
+    st.markdown(
+        "**Bootstrap** (10,000 resamples) gives percentile + BCa CIs. "
+        "**CUPED** residualizes deltas on job-side covariates:"
+    )
+    st.latex(
+        r"\hat{d}^{\,\mathrm{adj}}_i = d_i - X_i^\top\hat{\beta} + \bar{d}, "
+        r"\qquad \text{var. reduction} = 1 - \frac{\mathrm{var}(d^{adj})}{\mathrm{var}(d)} = R^2"
+    )
+    st.markdown(
+        "**mSPRT** (Robbins mixture) yields an always-valid p-value; "
+        "**Beta-Binomial** gives the Bayesian posterior of P(B>A per job); "
+        "**Bonferroni/BH-FDR** correct the 8 per-cluster tests."
+    )
     m1, m2, m3 = st.columns(3)
     m1.metric("Achieved power", f"{rep.achieved_power:.3f}")
     m2.metric("Required N @80%", f"{rep.required_n_80:.0f}")
-    m3.metric("CUPED var. reduction", f"{rep.cuped.variance_reduction*100:.1f}%")
+    m3.metric("CUPED var. reduction", f"{rep.cuped.variance_reduction * 100:.1f}%")
     st.caption("Minimum detectable effect (Cohen's d) by α × power:")
     st.dataframe(rep.mde, hide_index=True, use_container_width=True)
 
 
 def _cluster_table(rep) -> None:
-    view = rep.per_cluster[["label", "n", "mean_delta", "p_raw",
-                            "p_bonferroni", "p_bh_fdr", "winner"]].copy()
+    view = rep.per_cluster[
+        ["label", "n", "mean_delta", "p_raw", "p_bonferroni", "p_bh_fdr", "winner"]
+    ].copy()
     view["mean_delta"] = (view["mean_delta"] * 100).round(2)
     for c in ("p_raw", "p_bonferroni", "p_bh_fdr"):
         view[c] = view[c].round(4)
-    view = view.rename(columns={"label": "Cluster", "n": "N",
-                                "mean_delta": "Δ (pts)", "p_raw": "p (raw)",
-                                "p_bonferroni": "p (Bonf.)", "p_bh_fdr": "p (BH)",
-                                "winner": "Winner"})
+    view = view.rename(
+        columns={
+            "label": "Cluster",
+            "n": "N",
+            "mean_delta": "Δ (pts)",
+            "p_raw": "p (raw)",
+            "p_bonferroni": "p (Bonf.)",
+            "p_bh_fdr": "p (BH)",
+            "winner": "Winner",
+        }
+    )
     st.dataframe(view, hide_index=True, use_container_width=True)
 
 
@@ -169,33 +228,46 @@ def _results(rep, scoring, sid: str) -> None:
     forest = charts.forest_plot(rep.per_cluster)
 
     if variant == "B":
-        st.plotly_chart(forest, use_container_width=True)
-        _verdict_card(rep.verdict)
+        st.plotly_chart(forest, use_container_width=True, config={"displayModeBar": False})
+        _verdict_card(rep)
     else:
-        _verdict_card(rep.verdict)
-        st.plotly_chart(forest, use_container_width=True)
+        _verdict_card(rep)
+        st.plotly_chart(forest, use_container_width=True, config={"displayModeBar": False})
 
     left, right = st.columns(2)
     with left:
-        st.plotly_chart(charts.score_distributions(scoring.scores_a, scoring.scores_b),
-                        use_container_width=True)
+        st.plotly_chart(
+            charts.score_distributions(scoring.scores_a, scoring.scores_b),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
     with right:
-        st.plotly_chart(charts.bayesian_posterior(rep.bayes), use_container_width=True)
+        st.plotly_chart(
+            charts.bayesian_posterior(rep.bayes),
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
-    st.plotly_chart(charts.sequential_trajectory(rep.sequential), use_container_width=True)
+    st.plotly_chart(
+        charts.sequential_trajectory(rep.sequential),
+        use_container_width=True,
+        config={"displayModeBar": False},
+    )
 
     st.markdown("##### Per-cluster breakdown")
     _cluster_table(rep)
 
-    with st.expander("🔬 Methodology — what just happened",
-                     expanded=(variant == "B")):
-        analytics.capture(sid, analytics.EVENTS["methodology_toggled"],
-                          {"layout_variant": variant})
+    with st.expander("🔬 Methodology — what just happened", expanded=(variant == "B")):
+        analytics.capture(sid, analytics.EVENTS["methodology_toggled"], {"layout_variant": variant})
         _methodology_panel(rep)
 
     pdf = build_pdf_report(rep)
-    if st.download_button("⬇️ Download PDF report", data=pdf,
-                          file_name="resumematch_report.pdf", mime="application/pdf"):
+    if st.download_button(
+        "⬇️ Download PDF report",
+        data=pdf,
+        file_name="resumematch_report.pdf",
+        mime="application/pdf",
+    ):
         analytics.capture(sid, analytics.EVENTS["pdf_downloaded"], {})
 
 
@@ -221,14 +293,18 @@ def main() -> None:
         st.caption("A/B testing your resume against the live Indian tech job market.")
         st.markdown(f"**Corpus:** {corpus.n_jobs:,} jobs · {corpus.n_clusters} clusters")
         st.markdown("**Model:** BAAI/bge-small-en-v1.5 (384-dim)")
-        st.info("🔒 **Privacy:** resumes are processed in memory only and are never "
-                "stored or sent anywhere. Only anonymous usage metadata is tracked.")
+        st.info(
+            "🔒 **Privacy:** resumes are processed in memory only and are never "
+            "stored or sent anywhere. Only anonymous usage metadata is tracked."
+        )
         st.caption("Methodology case study & source on GitHub.")
 
     st.title("A/B Test Your Resume Against the Job Market")
-    st.markdown("Upload **two versions** of your resume. We embed both, score them "
-                f"against **{corpus.n_jobs:,} real Indian tech jobs**, and run a rigorous "
-                "statistical A/B test to tell you which wins — and *where*.")
+    st.markdown(
+        "Upload **two versions** of your resume. We embed both, score them "
+        f"against **{corpus.n_jobs:,} real Indian tech jobs**, and run a rigorous "
+        "statistical A/B test to tell you which wins — and *where*."
+    )
 
     if "first_load" not in st.session_state:
         st.session_state.first_load = True
@@ -243,10 +319,16 @@ def main() -> None:
             st.warning("Please provide both Resume A and Resume B (upload or paste).")
             return
 
-        analytics.capture(sid, analytics.EVENTS["resume_a_uploaded"],
-                          {"chars": a.char_count, "fmt": a.source_format})
-        analytics.capture(sid, analytics.EVENTS["resume_b_uploaded"],
-                          {"chars": b.char_count, "fmt": b.source_format})
+        analytics.capture(
+            sid,
+            analytics.EVENTS["resume_a_uploaded"],
+            {"chars": a.char_count, "fmt": a.source_format},
+        )
+        analytics.capture(
+            sid,
+            analytics.EVENTS["resume_b_uploaded"],
+            {"chars": b.char_count, "fmt": b.source_format},
+        )
         _render_preview(a, b)
 
         flags = _guardrails(a, b)
@@ -255,19 +337,22 @@ def main() -> None:
         if any(f.severity == "block" for f in flags):
             return
 
-        with st.spinner("Embedding resumes and scoring 2,000 jobs…"):
+        with st.spinner(f"Embedding resumes and scoring {corpus.n_jobs:,} jobs…"):
             scoring = compare_resumes(a, b, corpus)
             rep = analyze(scoring, corpus)
         st.session_state.rep = rep
         st.session_state.scoring = scoring
-        analytics.capture(sid, analytics.EVENTS["comparison_run"],
-                          {"n_jobs": rep.n_jobs})
-        analytics.capture(sid, analytics.EVENTS["verdict_revealed"], {
-            "winner": rep.verdict.winner,
-            "p_value": rep.verdict.p_value,
-            "cohens_d": rep.cohens_d,
-            "significant": rep.verdict.significant,
-        })
+        analytics.capture(sid, analytics.EVENTS["comparison_run"], {"n_jobs": rep.n_jobs})
+        analytics.capture(
+            sid,
+            analytics.EVENTS["verdict_revealed"],
+            {
+                "winner": rep.verdict.winner,
+                "p_value": rep.verdict.p_value,
+                "cohens_d": rep.cohens_d,
+                "significant": rep.verdict.significant,
+            },
+        )
 
     if "rep" in st.session_state:
         _results(st.session_state.rep, st.session_state.scoring, sid)

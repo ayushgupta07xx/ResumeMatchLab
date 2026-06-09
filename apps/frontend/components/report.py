@@ -33,44 +33,57 @@ def _fmt_p(p: float) -> str:
 
 
 def _table_style() -> TableStyle:
-    return TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), _HEADER_BG),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, _ALT_BG]),
-        ("GRID", (0, 0), (-1, -1), 0.25, _GRID),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 6),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-    ])
+    return TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), _HEADER_BG),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, _ALT_BG]),
+            ("GRID", (0, 0), (-1, -1), 0.25, _GRID),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ]
+    )
 
 
 def build_pdf_report(report) -> bytes:
     """Render an ``AnalysisReport`` to PDF bytes."""
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
-        buf, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
-        topMargin=16 * mm, bottomMargin=16 * mm, title="ResumeMatch Lab Report",
+        buf,
+        pagesize=A4,
+        leftMargin=18 * mm,
+        rightMargin=18 * mm,
+        topMargin=16 * mm,
+        bottomMargin=16 * mm,
+        title="ResumeMatch Lab Report",
     )
     styles = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=styles["Title"], fontSize=18, spaceAfter=4)
-    sub = ParagraphStyle("sub", parent=styles["Normal"], textColor=colors.grey,
-                         fontSize=8.5, spaceAfter=10)
-    verdict_style = ParagraphStyle("verdict", parent=styles["Heading2"],
-                                   fontSize=13, spaceBefore=6, spaceAfter=8)
+    sub = ParagraphStyle(
+        "sub", parent=styles["Normal"], textColor=colors.grey, fontSize=8.5, spaceAfter=10
+    )
+    verdict_style = ParagraphStyle(
+        "verdict", parent=styles["Heading2"], fontSize=13, spaceBefore=6, spaceAfter=8
+    )
     v = report.verdict
     s = report.scores_summary
 
     story = [
         Paragraph("ResumeMatch Lab — A/B Test Report", h1),
         Paragraph(
-            "Resume A vs Resume B scored against 2,000 Indian tech jobs · "
-            "BAAI/bge-small-en-v1.5 (384-dim) · reproducible with seed=42", sub),
+            f"Resume A vs Resume B scored against {report.n_jobs:,} Indian tech jobs · "
+            "BAAI/bge-small-en-v1.5 (384-dim) · reproducible with seed=42",
+            sub,
+        ),
         Paragraph(v.headline, verdict_style),
-        Paragraph(f"Winner: <b>{v.winner}</b> &nbsp;·&nbsp; confidence: "
-                  f"<b>{v.confidence}</b>", styles["Normal"]),
+        Paragraph(
+            f"Winner: <b>{v.winner}</b> &nbsp;·&nbsp; confidence: <b>{v.confidence}</b>",
+            styles["Normal"],
+        ),
         Spacer(1, 10),
         Paragraph("Headline statistics", styles["Heading3"]),
     ]
@@ -84,23 +97,31 @@ def build_pdf_report(report) -> bytes:
         [f"{report.primary_test.name} p-value", _fmt_p(report.primary_test.pvalue)],
         ["Cohen's d", f"{report.cohens_d:.3f}"],
         ["Achieved power", f"{report.achieved_power:.3f}"],
-        ["Bootstrap BCa 95% CI",
-         f"[{report.bootstrap.bca_low * 100:+.2f}, {report.bootstrap.bca_high * 100:+.2f}] pts"],
-        ["CUPED variance reduction",
-         f"{report.cuped.variance_reduction * 100:.1f}% (eff. N ×{report.cuped.effective_n_multiplier:.2f})"],
+        [
+            "Bootstrap BCa 95% CI",
+            f"[{report.bootstrap.bca_low * 100:+.2f}, {report.bootstrap.bca_high * 100:+.2f}] pts",
+        ],
+        [
+            "CUPED variance reduction",
+            f"{report.cuped.variance_reduction * 100:.1f}% (eff. N ×{report.cuped.effective_n_multiplier:.2f})",
+        ],
         ["mSPRT always-valid p", _fmt_p(report.sequential.always_valid_p)],
         ["Bayesian P(B>A per job)", f"{report.bayes.prob_b_beats_a:.3f}"],
     ]
     summary = Table(summary_rows, colWidths=[70 * mm, 90 * mm])
     summary.setStyle(_table_style())
-    story += [summary, Spacer(1, 12),
-              Paragraph("Per-cluster breakdown (BH-FDR corrected)", styles["Heading3"])]
+    story += [
+        summary,
+        Spacer(1, 12),
+        Paragraph("Per-cluster breakdown (BH-FDR corrected)", styles["Heading3"]),
+    ]
 
     cluster_rows = [["Cluster", "n", "Δ (pts)", "p (BH)", "Winner"]]
     for _, r in report.per_cluster.iterrows():
         md = "—" if pd.isna(r["mean_delta"]) else f"{r['mean_delta'] * 100:+.2f}"
-        cluster_rows.append([str(r["label"]), str(int(r["n"])), md,
-                             _fmt_p(r["p_bh_fdr"]), str(r["winner"])])
+        cluster_rows.append(
+            [str(r["label"]), str(int(r["n"])), md, _fmt_p(r["p_bh_fdr"]), str(r["winner"])]
+        )
     cluster = Table(cluster_rows, colWidths=[60 * mm, 16 * mm, 28 * mm, 28 * mm, 28 * mm])
     cluster.setStyle(_table_style())
     story += [
@@ -110,7 +131,8 @@ def build_pdf_report(report) -> bytes:
             "Privacy: resumes are processed in memory only and are never stored. "
             "Scores are cosine similarities of sentence-transformer embeddings and "
             "proxy textual match, not hiring outcomes. Generated by ResumeMatch Lab.",
-            sub),
+            sub,
+        ),
     ]
     doc.build(story)
     return buf.getvalue()
