@@ -27,7 +27,7 @@ st.set_page_config(page_title="ResumeMatch Lab", page_icon="📄", layout="wide"
 
 VERDICT_BG = {"B": "#dcfce7", "A": "#fee2e2", "tie": "#f3f4f6"}
 VERDICT_BORDER = {"B": "#16a34a", "A": "#dc2626", "tie": "#9ca3af"}
-CONF_BADGE = {"high": "🟢 high", "moderate": "🟡 moderate", "low": "⚪ low"}
+CONF_BADGE = {"high": "●●● high", "moderate": "●●○ moderate", "low": "●○○ low"}
 
 
 @st.cache_resource(show_spinner="Loading job corpus…")
