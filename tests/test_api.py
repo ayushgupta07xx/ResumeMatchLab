@@ -10,9 +10,7 @@ from core.scoring import compare_resumes
 from stats.engine import analyze
 from tests.conftest import fake_embedder
 
-pytestmark = pytest.mark.skipif(
-    not JOBS_PARQUET.exists(), reason="job snapshot not built"
-)
+pytestmark = pytest.mark.skipif(not JOBS_PARQUET.exists(), reason="job snapshot not built")
 
 client = TestClient(app)
 
@@ -22,7 +20,7 @@ def test_health():
     assert r.status_code == 200
     body = r.json()
     assert body["status"] == "ok"
-    assert body["n_jobs"] == 2000
+    assert body["n_jobs"] == 9014
     assert body["n_clusters"] == 8
     assert body["model"].startswith("BAAI/")
 
@@ -39,15 +37,25 @@ def test_serializer_contract():
     )
     payload = report_to_dict(analyze(scoring, corpus), scoring)
 
-    for key in ("verdict", "summary", "tests", "effect", "bootstrap",
-                "cuped", "sequential", "bayes", "distributions", "clusters"):
+    for key in (
+        "verdict",
+        "summary",
+        "tests",
+        "effect",
+        "bootstrap",
+        "cuped",
+        "sequential",
+        "bayes",
+        "distributions",
+        "clusters",
+    ):
         assert key in payload
 
     assert payload["verdict"]["winner"] in {"A", "B", "tie"}
     assert len(payload["clusters"]) == 8
     assert len(payload["bayes"]["posterior_curve"]) == 128
     assert len(payload["distributions"]["bin_centers"]) == 40
-    assert payload["summary"]["n_jobs"] == 2000
+    assert payload["summary"]["n_jobs"] == 9014
 
 
 def test_compare_text_rejects_short_input():

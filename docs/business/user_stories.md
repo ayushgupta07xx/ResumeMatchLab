@@ -38,7 +38,7 @@ Twelve user stories for ResumeMatch Lab, written against the three personas defi
 **As** Fresh-Graduate Anjali, **I want** each resume scored against real Indian tech job postings, **so that** my result reflects the actual market and not a generic checklist.
 
 **Acceptance criteria**
-- **Given** two parsed resumes, **when** I run the test, **then** each variant is embedded (bge-small-en-v1.5, 384-dim) and scored against all 2,000 postings.
+- **Given** two parsed resumes, **when** I run the test, **then** each variant is embedded (bge-small-en-v1.5, 384-dim) and scored against all 9,014 postings.
 - **Given** scoring completes, **when** I view the result, **then** I see a single market-fit score for each variant.
 - **Given** scoring is running, **when** I wait, **then** a progress indicator shows the run is active and finishes within a reasonable time on Streamlit Community Cloud.
 
@@ -87,7 +87,7 @@ Twelve user stories for ResumeMatch Lab, written against the three personas defi
 **As** Career-Switcher Rohit, **I want** to see how each variant scores across the 8 job clusters, **so that** I can confirm my rewrite moves me toward analytics and away from QA.
 
 **Acceptance criteria**
-- **Given** the test has run, **when** I open the cluster view, **then** a forest plot shows the per-cluster A-vs-B difference with confidence intervals for all 8 clusters (Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, QA/Testing).
+- **Given** the test has run, **when** I open the cluster view, **then** a forest plot shows the per-cluster A-vs-B difference with confidence intervals for all 8 clusters (Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, Design/UX).
 - **Given** I look at a specific cluster, **when** I read its row, **then** I can tell whether B beat A there and whether that cluster's difference is significant.
 
 **Points:** 5 · **Priority:** Must
@@ -134,7 +134,7 @@ Twelve user stories for ResumeMatch Lab, written against the three personas defi
 **As** Career-Switcher Rohit, **I want** to see how the score and verdict are computed, **so that** I can trust the result instead of treating it as a black-box grade.
 
 **Acceptance criteria**
-- **Given** I view the results, **when** I open a "methodology" or "how this works" section, **then** the embedding model, corpus size (2,000 postings), test type, and CI method are clearly described.
+- **Given** I view the results, **when** I open a "methodology" or "how this works" section, **then** the embedding model, corpus size (9,014 postings), test type, and CI method are clearly described.
 - **Given** I want context, **when** I read the methodology, **then** the known limitations (embedding-as-proxy, single snapshot) are stated honestly.
 
 **Points:** 2 · **Priority:** Should

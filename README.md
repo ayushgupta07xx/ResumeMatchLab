@@ -12,11 +12,11 @@
 Upload **two versions of your resume**, and ResumeMatch Lab runs a rigorous statistical
 **A/B test** to tell you which one matches more Indian tech jobs — by how much, with what
 confidence, and *in which job clusters*. Not generic ATS keyword scoring: a real paired
-experiment against **2,000 live job postings**, with frequentist, Bayesian, and sequential
+experiment against **9,014 live job postings**, with frequentist, Bayesian, and sequential
 inference.
 
-> **Verdict example:** *"Resume A wins by 2.08 points (95% CI [1.84, 2.30], p < 0.001).
-> But B wins **Machine Learning / AI** by +3.87 — send B for ML roles, A for infra."*
+> **Verdict example:** *"Resume A wins by 2.21 points (95% CI [2.11, 2.32], p < 0.001).
+> But B wins **Machine Learning / AI** by +3.78 — send B for ML and DevOps roles, A for the rest."*
 
 ---
 
@@ -24,7 +24,7 @@ inference.
 
 | | Resume.io / Enhancv / Resume Worded | **ResumeMatch Lab** |
 |---|---|---|
-| Scoring basis | Generic ATS keyword rules | Semantic match vs **2,000 real jobs** |
+| Scoring basis | Generic ATS keyword rules | Semantic match vs **9,014 real jobs** |
 | A/B comparison | ❌ | ✅ Rigorous paired experiment |
 | Statistical rigor | ❌ | Bootstrap BCa, CUPED, mSPRT, Bayesian, FDR |
 | Where you win | One global score | **Per-cluster** forest plot (8 job clusters) |
@@ -38,7 +38,7 @@ Every analysis runs on the per-job paired delta `dᵢ = score_B(i) − score_A(i
 - **Frequentist** — paired t-test / Wilcoxon, auto-selected by a Shapiro-Wilk normality gate
 - **Effect size & CI** — Cohen's *d*; 10,000-resample **bootstrap** with percentile + **BCa** intervals
 - **Power** — required N, achieved power, and a minimum-detectable-effect (MDE) table
-- **CUPED** — regression-based variance reduction on job-side covariates (~**55%** reduction in the demo run → effective N ×2.2)
+- **CUPED** — regression-based variance reduction on job-side covariates (~**50%** reduction in the demo run → effective N ×2.0)
 - **mSPRT** — Robbins mixture sequential test → **always-valid p-values** (peek any time)
 - **Bayesian** — Beta-Binomial posterior of `P(B beats A on a job)` with credible interval
 - **Multiple comparisons** — per-cluster tests with **Bonferroni** + **Benjamini-Hochberg FDR**
@@ -48,15 +48,15 @@ publishable-quality writeup with derivations, design choices, and references.
 
 ## 🧬 Data: real jobs, shared embeddings
 
-The 2,000-job corpus and its 384-dim embeddings are exported directly from the author's
+The 9,014-job corpus and its 384-dim embeddings are exported directly from the author's
 sibling project **[JobAtlas](../JobAtlas)** — the same `BAAI/bge-small-en-v1.5` vectors,
 the same job universe. This makes the two products *consistent by construction*
 and lets ResumeMatch ship a pre-embedded snapshot so it runs **fully offline**.
 
 ```
-data/jobs_snapshot/jobs.parquet          2,000 jobs · 8 clusters (committed)
+data/jobs_snapshot/jobs.parquet          9,014 jobs · 8 clusters (committed)
 data/jobs_snapshot/cluster_labels.parquet
-embeddings/jobs_cache.parquet            2,000 × 384 L2-normalized vectors
+embeddings/jobs_cache.parquet            9,014 × 384 L2-normalized vectors
 ```
 
 ## 🚀 Quickstart

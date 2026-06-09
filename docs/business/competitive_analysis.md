@@ -32,7 +32,7 @@ Naukri dominates Indian job search and offers resume **display, paid visibility,
 | **ATS / keyword scoring** | Partial (format) | Yes | Yes (core) | Yes (per-JD) | Basic | Indirect (semantic) |
 | **A/B test of two variants** | No | No | No | No | No | **Yes (core)** |
 | **Statistical rigor** (CI, effect size, sequential, Bayesian) | No | No | No | No | No | **Yes (deep)** |
-| **Live job-market grounding** | No | No | Per-JD only | Per-JD only | Job board, not analytic | **Yes (2,000 postings)** |
+| **Live job-market grounding** | No | No | Per-JD only | Per-JD only | Job board, not analytic | **Yes (9,014 postings)** |
 | **Per-cluster breakdown** (8 clusters) | No | No | No | No | No | **Yes** |
 | **India focus** | No | No | No | No | Yes | **Yes** |
 | **Price** | Paid subscription | Paid subscription | Freemium, paid core | Freemium, paid core | Freemium / paid visibility | **Free (₹0)** |
@@ -71,7 +71,7 @@ Six decision criteria are weighted by how much they matter to ResumeMatch's targ
 
 **Weighted-total computation for ResumeMatch:** (5×0.25)+(5×0.20)+(4×0.20)+(5×0.15)+(5×0.10)+(5×0.10) = 1.25+1.00+0.80+0.75+0.50+0.50 = **4.80**.
 
-ResumeMatch scores a 4 (not 5) on market grounding *on purpose* — the corpus is a single 2,000-posting snapshot and the score is an embedding proxy, an honest cap acknowledged in the SWOT.
+ResumeMatch scores a 4 (not 5) on market grounding *on purpose* — the corpus is a single 9,014-posting snapshot and the score is an embedding proxy, an honest cap acknowledged in the SWOT.
 
 ---
 

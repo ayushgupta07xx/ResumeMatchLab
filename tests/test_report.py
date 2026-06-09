@@ -10,9 +10,7 @@ from core.scoring import compare_resumes
 from stats.engine import analyze
 from tests.conftest import fake_embedder
 
-pytestmark = pytest.mark.skipif(
-    not JOBS_PARQUET.exists(), reason="job snapshot not built"
-)
+pytestmark = pytest.mark.skipif(not JOBS_PARQUET.exists(), reason="job snapshot not built")
 
 
 def _build():

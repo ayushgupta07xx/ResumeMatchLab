@@ -1,6 +1,6 @@
 # SWOT Analysis — ResumeMatch Lab
 
-A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab — a free Streamlit app that runs a statistically rigorous A/B test of two resume variants against a snapshot of 2,000 real Indian tech job postings across 8 clusters. This SWOT is written to be honest about methodological limits (embedding-as-proxy, single-snapshot data, no recruiter-side validation), because credibility with a hiring manager depends on it.
+A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab — a free Streamlit app that runs a statistically rigorous A/B test of two resume variants against a snapshot of 9,014 real Indian tech job postings across 8 clusters. This SWOT is written to be honest about methodological limits (embedding-as-proxy, single-snapshot data, no recruiter-side validation), because credibility with a hiring manager depends on it.
 
 ---
 
@@ -8,8 +8,8 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 
 - **Genuinely differentiated value prop.** It is the only tool in its competitive set (Resume.io, Enhancv, Resume Worded, Teal) that runs a *real statistical A/B test against the live job market with a per-cluster breakdown*, rather than generic ATS keyword scoring.
 - **Statistical credibility as a moat.** Paired t-test/Wilcoxon, 10k-resample bootstrap CIs, Cohen's d, power analysis, CUPED variance reduction, mSPRT always-valid testing, a Bayesian posterior, and Bonferroni/BH-FDR correction across 8 clusters — this depth is rare in consumer resume tools and signals serious analyst skill.
-- **Market-grounded, not checklist-based.** Scores are computed against 2,000 actual Indian tech postings, so feedback reflects what the market is hiring for, not a one-size-fits-all template rubric.
-- **Per-cluster insight is uniquely actionable.** The forest plot across Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, and QA/Testing turns a vague "improve your resume" into "you moved toward analytics and away from QA."
+- **Market-grounded, not checklist-based.** Scores are computed against 9,014 actual Indian tech postings, so feedback reflects what the market is hiring for, not a one-size-fits-all template rubric.
+- **Per-cluster insight is uniquely actionable.** The forest plot across Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, and Design/UX turns a vague "improve your resume" into "you moved toward analytics and away from QA."
 - **Zero cost and zero friction.** Free on Streamlit Community Cloud (₹0/month to operate), no sign-up, no payment — perfectly matched to price-sensitive Indian freshers.
 - **Privacy by default.** Resumes are processed in-memory only and never persisted, which is a concrete trust advantage over tools that store user documents.
 
@@ -20,7 +20,7 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 ## Weaknesses
 
 - **Embedding similarity is a proxy, not a hiring outcome.** Cosine similarity between a resume embedding and a job-posting embedding correlates with relevance but does not measure callbacks, interviews, or offers. A "win" is a win on the proxy, and this must be stated plainly.
-- **Single-snapshot, single-source corpus.** The 2,000 postings are one snapshot from the sibling JobAtlas project (Adzuna/Jobicy/etc.). It can drift out of date, may under-represent certain roles or seniorities, and inherits any sampling bias of its aggregators.
+- **Single-snapshot, single-source corpus.** The 9,014 postings are one snapshot from the sibling JobAtlas project (Adzuna/Jobicy/etc.). It can drift out of date, may under-represent certain roles or seniorities, and inherits any sampling bias of its aggregators.
 - **No recruiter-side validation.** Nothing in the loop confirms that a higher-scoring resume actually performs better with real recruiters or ATS systems — the tool optimizes for market-text similarity, not verified recruiter behaviour.
 - **Statistical rigor can intimidate non-technical users.** Anjali (the fresher) does not want a forest plot; if the plain-language layer is weak, the rigor becomes a usability liability rather than an asset.
 - **Cold-start dependency on the user.** Output quality depends entirely on the user supplying two *meaningfully different* variants; near-identical uploads produce an honest but anticlimactic "effectively tied" verdict.

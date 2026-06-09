@@ -8,15 +8,13 @@ from core.scoring import compare_resumes, score_against_jobs
 from stats.engine import analyze
 from tests.conftest import fake_embedder
 
-pytestmark = pytest.mark.skipif(
-    not JOBS_PARQUET.exists(), reason="job snapshot not built"
-)
+pytestmark = pytest.mark.skipif(not JOBS_PARQUET.exists(), reason="job snapshot not built")
 
 
 def test_corpus_loads():
     c = load_corpus()
-    assert c.n_jobs == 2000
-    assert c.matrix.shape == (2000, 384)
+    assert c.n_jobs == 9014
+    assert c.matrix.shape == (9014, 384)
     norms = np.linalg.norm(c.matrix, axis=1)
     assert np.allclose(norms, 1.0, atol=1e-4)
     assert c.n_clusters == 8
@@ -25,7 +23,7 @@ def test_corpus_loads():
 def test_score_against_jobs_range():
     c = load_corpus()
     s = score_against_jobs(fake_embedder()("devops engineer"), c.matrix)
-    assert s.shape == (2000,)
+    assert s.shape == (9014,)
     assert s.min() >= -1.01 and s.max() <= 1.01
 
 
@@ -44,7 +42,7 @@ def test_end_to_end_analyze():
         embed=fake_embedder(),
     )
     rep = analyze(scoring, c)
-    assert rep.n_jobs == 2000
+    assert rep.n_jobs == 9014
     assert rep.verdict.winner in {"A", "B", "tie"}
     assert len(rep.per_cluster) == 8
     assert 0.0 <= rep.cuped.variance_reduction <= 1.0

@@ -1,6 +1,6 @@
 # User Personas — ResumeMatch Lab
 
-ResumeMatch Lab is a free Streamlit web app that lets a job seeker upload **two versions of their resume** (Variant A and Variant B), embeds both with a sentence-transformer model (BAAI/bge-small-en-v1.5, 384-dim), and runs a **statistically rigorous A/B test** of each version against a snapshot of **2,000 real Indian tech job postings** across 8 job clusters. The output is a verdict card ("Resume B wins by 8.4 points, 95% CI [4.1, 12.7], p<0.001"), a per-cluster forest plot, score distributions, a Bayesian posterior, and a downloadable PDF report.
+ResumeMatch Lab is a free Streamlit web app that lets a job seeker upload **two versions of their resume** (Variant A and Variant B), embeds both with a sentence-transformer model (BAAI/bge-small-en-v1.5, 384-dim), and runs a **statistically rigorous A/B test** of each version against a snapshot of **9,014 real Indian tech job postings** across 8 job clusters. The output is a verdict card ("Resume B wins by 8.4 points, 95% CI [4.1, 12.7], p<0.001"), a per-cluster forest plot, score distributions, a Bayesian posterior, and a downloadable PDF report.
 
 These three personas anchor every other artefact in this package (user stories, SWOT, market sizing, competitive analysis). They represent the three highest-value segments of the Indian tech job-seeker funnel: the **fresher**, the **career switcher**, and the **selective senior**.
 
@@ -56,11 +56,11 @@ Anjali wakes up, checks her placement-cell WhatsApp group, and sees three new op
 | **Budget** | Will pay ₹200–500 one-time for a clearly useful result; subscription-averse |
 
 ### A day in the life
-Rohit works a full QA day, then studies analytics from 9 to 11 p.m. He has rebuilt his resume to foreground his SQL projects and a churn-analysis capstone, and buried the "manual testing" language. But he is anxious: recruiters keep slotting him back into QA/Testing roles. He cannot tell whether his rewrite genuinely repositions him toward analytics, or whether the old "tester" signal still dominates the document. He needs evidence, not vibes.
+Rohit works a full QA day, then studies analytics from 9 to 11 p.m. He has rebuilt his resume to foreground his SQL projects and a churn-analysis capstone, and buried the "manual testing" language. But he is anxious: recruiters keep slotting him back into QA roles. He cannot tell whether his rewrite genuinely repositions him toward analytics, or whether the old "tester" signal still dominates the document. He needs evidence, not vibes.
 
 ### Goals
 - **Prove repositioning works** — confirm the rewritten resume reads as "analytics", not "QA".
-- Quantify how far he has moved *away from* the QA/Testing cluster and *toward* Data & Analytics.
+- Quantify how far he has moved *toward* Data & Analytics and *away from* the Backend-engineering signal his testing past carries.
 - Avoid burning his limited recruiter goodwill on a resume that still signals the wrong role.
 
 ### Pain points
@@ -69,7 +69,7 @@ Rohit works a full QA day, then studies analytics from 9 to 11 p.m. He has rebui
 - **Trust.** He distrusts tools that give a vague "82/100" with no methodology.
 
 ### How ResumeMatch helps Rohit
-- The **per-cluster breakdown** is his killer feature: he can literally watch his score **rise on Data & Analytics and fall on QA/Testing** between Variant A (old) and Variant B (rewritten). That is the repositioning proof he wanted.
+- The **per-cluster breakdown** is his killer feature: he can literally watch his score **rise on Data & Analytics and fall on Backend Engineering** between Variant A (old) and Variant B (rewritten). That is the repositioning proof he wanted.
 - The **statistical rigor** (paired test, bootstrap CI, Cohen's d, Bayesian posterior) earns his trust — he sees a confidence interval, not a mystery grade.
 - The downloadable **PDF report** gives him an artefact to reason about and revisit as he iterates draft C.
 
@@ -120,7 +120,7 @@ Sneha rarely job-hunts in volume. When she does move, it's deliberate — a hand
 | **Application volume** | Very high (spray) | Medium (targeted) | Very low (selective) |
 | **Tech / stats literacy** | Low | High | Very high |
 | **Willingness to pay** | ₹0 (student) | ₹200–500 one-time | Pays for real signal |
-| **Primary job clusters** | Data & Analytics, Data Eng | Data & Analytics vs. QA/Testing | Product Management |
+| **Primary job clusters** | Data & Analytics, Data Eng | Data & Analytics vs. Backend Eng | Product Management |
 | **Killer feature for them** | Plain-language verdict + free | Per-cluster repositioning proof | Statistical rigor + privacy |
 | **Biggest objection removed** | Cost | "Generic ATS is useless to me" | Privacy + senior-role grounding |
 

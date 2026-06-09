@@ -1,6 +1,6 @@
 """Export ResumeMatch's static job snapshot from JobAtlas's Postgres.
 
-Pulls ~2,000 active, de-duplicated Indian tech jobs together with their
+Pulls all active, de-duplicated Indian tech jobs together with their
 pre-computed ``BAAI/bge-small-en-v1.5`` (384-dim, L2-normalized) embeddings,
 then runs K-means (k=8) to assign stable cluster labels for stratified
 analysis. Reusing JobAtlas's corpus means both portfolio projects share one job
@@ -28,7 +28,6 @@ from sqlalchemy import create_engine, text
 REPO = Path(__file__).resolve().parents[1]
 JOBATLAS_ENV = Path.home() / "code" / "JobAtlas" / ".env"
 
-N_JOBS = 2000
 K = 8
 SEED = 42
 
@@ -47,25 +46,61 @@ QUERY = text(
     JOIN staging.jobs_embeddings e ON e.job_id = j.id
     WHERE j.is_active = true AND COALESCE(j.is_duplicate, false) = false
     ORDER BY md5(j.id::text)
-    LIMIT :n
     """
 )
 
 STOP = {
-    "engineer", "developer", "senior", "junior", "lead", "india", "remote",
-    "manager", "analyst", "intern", "associate", "staff", "principal", "with",
-    "work", "team", "years", "experience", "full", "time", "hybrid", "based",
+    "engineer",
+    "developer",
+    "senior",
+    "junior",
+    "lead",
+    "india",
+    "remote",
+    "manager",
+    "analyst",
+    "intern",
+    "associate",
+    "staff",
+    "principal",
+    "with",
+    "work",
+    "team",
+    "years",
+    "experience",
+    "full",
+    "time",
+    "hybrid",
+    "based",
 }
 
 # Keyword -> human cluster label, checked in priority order against pooled titles.
 LABEL_RULES = [
     ("Data Engineering", ("data engineer", "etl", "pipeline", "spark", "warehouse", "big data")),
-    ("Data & Analytics", ("data analyst", "analytics", "business intelligence", "tableau", "power bi")),
-    ("Machine Learning / AI", ("machine learning", "ml engineer", "data scientist", "nlp", "deep learning", "ai ")),
-    ("DevOps / SRE / Cloud", ("devops", "sre", "site reliability", "infrastructure", "kubernetes", "platform", "cloud")),
-    ("Backend Engineering", ("backend", "back end", "java ", "golang", "node", "microservice", "api ")),
-    ("Frontend / Mobile", ("frontend", "front end", "react", "angular", "android", "ios", "flutter")),
-    ("Product Management", ("product manager", "product owner", "program manager", "product analyst")),
+    (
+        "Data & Analytics",
+        ("data analyst", "analytics", "business intelligence", "tableau", "power bi"),
+    ),
+    (
+        "Machine Learning / AI",
+        ("machine learning", "ml engineer", "data scientist", "nlp", "deep learning", "ai "),
+    ),
+    (
+        "DevOps / SRE / Cloud",
+        ("devops", "sre", "site reliability", "infrastructure", "kubernetes", "platform", "cloud"),
+    ),
+    (
+        "Backend Engineering",
+        ("backend", "back end", "java ", "golang", "node", "microservice", "api "),
+    ),
+    (
+        "Frontend / Mobile",
+        ("frontend", "front end", "react", "angular", "android", "ios", "flutter"),
+    ),
+    (
+        "Product Management",
+        ("product manager", "product owner", "program manager", "product analyst"),
+    ),
     ("Design / UX", ("designer", "ux", "ui/ux", "graphic", "creative")),
     ("QA / Testing", ("qa ", "quality assurance", "test engineer", "sdet", "automation test")),
     ("Security", ("security", "infosec", "penetration", "soc ")),
@@ -91,7 +126,7 @@ def load_db_urls() -> list[str]:
 def to_sqlalchemy(url: str) -> str:
     for prefix in ("postgresql+psycopg2://", "postgresql://", "postgres://"):
         if url.startswith(prefix):
-            return "postgresql+psycopg://" + url[len(prefix):]
+            return "postgresql+psycopg://" + url[len(prefix) :]
     return url
 
 
@@ -101,7 +136,7 @@ def fetch_jobs() -> pd.DataFrame:
         try:
             engine = create_engine(to_sqlalchemy(raw), future=True)
             with engine.connect() as conn:
-                df = pd.read_sql(QUERY, conn, params={"n": N_JOBS})
+                df = pd.read_sql(QUERY, conn)
             engine.dispose()
             if len(df):
                 host = re.sub(r"://[^@]+@", "://***@", raw).split("@")[-1].split("/")[0]
@@ -114,13 +149,17 @@ def fetch_jobs() -> pd.DataFrame:
 
 
 def parse_embeddings(series: pd.Series) -> np.ndarray:
-    mat = np.vstack([
-        np.fromstring(s.strip().lstrip("[").rstrip("]"), sep=",", dtype=np.float32)
-        for s in series
-    ])
+    mat = np.vstack(
+        [
+            np.fromstring(s.strip().lstrip("[").rstrip("]"), sep=",", dtype=np.float32)
+            for s in series
+        ]
+    )
     norms = np.linalg.norm(mat, axis=1)
-    print(f"embedding matrix {mat.shape}, mean L2 norm {norms.mean():.4f} "
-          f"(min {norms.min():.4f}, max {norms.max():.4f})")
+    print(
+        f"embedding matrix {mat.shape}, mean L2 norm {norms.mean():.4f} "
+        f"(min {norms.min():.4f}, max {norms.max():.4f})"
+    )
     return mat
 
 
@@ -136,8 +175,7 @@ def label_clusters(titles_by_cluster: dict[int, str]) -> dict[int, str]:
                 chosen = name
                 break
         if chosen is None:
-            toks = Counter(t for t in re.findall(r"[a-z]+", titles)
-                           if len(t) > 3 and t not in STOP)
+            toks = Counter(t for t in re.findall(r"[a-z]+", titles) if len(t) > 3 and t not in STOP)
             chosen = (toks.most_common(1)[0][0].title() + " Roles") if toks else f"Cluster {cid}"
         used.add(chosen)
         out[cid] = chosen
@@ -153,8 +191,17 @@ def main() -> None:
     for col in ("salary_min", "salary_max"):
         df[col] = pd.to_numeric(df[col], errors="coerce")
     df["skills"] = df["skills"].apply(lambda x: list(x) if x is not None else [])
-    for col in ("title", "company", "city", "state", "country", "description",
-                "source", "source_url", "currency"):
+    for col in (
+        "title",
+        "company",
+        "city",
+        "state",
+        "country",
+        "description",
+        "source",
+        "source_url",
+        "currency",
+    ):
         df[col] = df[col].astype("string")
 
     km = KMeans(n_clusters=K, random_state=SEED, n_init=10)

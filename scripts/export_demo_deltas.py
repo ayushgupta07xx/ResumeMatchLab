@@ -33,14 +33,16 @@ def main() -> None:
     scoring = compare_resumes(resume_a, resume_b, corpus)
 
     desc_len = corpus.jobs["description"].fillna("").str.len().to_numpy()
-    pd.DataFrame({
-        "delta": scoring.deltas,
-        "score_a": scoring.scores_a,
-        "score_b": scoring.scores_b,
-        "cluster_id": scoring.cluster_ids,
-        "cluster_label": scoring.cluster_labels,
-        "desc_len": desc_len,
-    }).to_csv(OUT, index=False)
+    pd.DataFrame(
+        {
+            "delta": scoring.deltas,
+            "score_a": scoring.scores_a,
+            "score_b": scoring.scores_b,
+            "cluster_id": scoring.cluster_ids,
+            "cluster_label": scoring.cluster_labels,
+            "desc_len": desc_len,
+        }
+    ).to_csv(OUT, index=False)
 
     rep = analyze(scoring, corpus)
     reference = {

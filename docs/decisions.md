@@ -6,7 +6,7 @@ Short ADRs capturing the *why* behind ResumeMatch Lab's key choices.
 **Context.** ResumeMatch needs a representative job corpus with embeddings. The sibling
 project JobAtlas already has ~9,000 deduplicated Indian tech jobs embedded with
 `BAAI/bge-small-en-v1.5` in Postgres.
-**Decision.** Export 2,000 active, non-duplicate jobs *with their existing vectors* into
+**Decision.** Export 9,014 active, non-duplicate jobs *with their existing vectors* into
 committed Parquet (`scripts/export_from_jobatlas.py`).
 **Consequences.** Real data, zero re-embedding of the corpus, and — crucially — the two
 products share one job universe and identical vectors (consistency story). The app
@@ -37,14 +37,14 @@ picks the valid test automatically (embedding deltas are often non-normal → Wi
 **Context.** Delta distributions can be skewed; parametric CIs may mislead.
 **Decision.** 10,000-resample bootstrap, report percentile **and** BCa; BCa is headline.
 **Consequences.** Skew/bias-corrected interval, robust to non-normality, at trivial compute
-cost for N = 2,000.
+cost for N = 9,014.
 
 ## ADR-6: CUPED on job-side covariates (not resume-level)
 **Context.** The original spec named resume-level covariates (length, skill density), but
-those are constant across the 2,000 jobs and cannot reduce per-job variance.
+those are constant across the 9,014 jobs and cannot reduce per-job variance.
 **Decision.** Use job-side covariates — cluster one-hot + job-description length — and
 residualize the deltas.
-**Consequences.** Genuine, defensible variance reduction (~55% in the demo, driven by
+**Consequences.** Genuine, defensible variance reduction (~50% in the demo, driven by
 between-cluster structure). Deviation from spec documented openly (see methodology §8).
 
 ## ADR-7: mSPRT (Robbins mixture) for always-valid p-values

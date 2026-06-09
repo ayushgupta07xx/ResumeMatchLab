@@ -12,7 +12,7 @@ ResumeMatch Lab answers a deceptively simple question a job seeker actually has:
 *"I have two versions of my resume — which one matches more jobs, by how much, and
 where?"* We treat it as a designed experiment rather than a vibe check. Both resume
 variants are embedded with a sentence-transformer (`BAAI/bge-small-en-v1.5`, 384-dim)
-and scored by cosine similarity against a fixed snapshot of **2,000 real Indian tech
+and scored by cosine similarity against a fixed snapshot of **9,014 real Indian tech
 job postings**. Because every job is scored by **both** resumes, the data is naturally
 **paired**, and the per-job score difference `d_i = score_B(i) − score_A(i)` becomes the
 unit of analysis.
@@ -35,12 +35,12 @@ BCa intervals, job-side CUPED covariates, a mixture sequential test, and multipl
 control across 8 job clusters — are explained and justified in the sections that follow.
 
 **Headline result on the reference run.** Comparing a DevOps-flavored resume (A) against a
-Data-Science-flavored resume (B) over the corpus, A wins *overall* by **2.08 points**
-(bootstrap BCa 95% CI [1.84, 2.30], Wilcoxon p ≈ 7e-75, Cohen's *d* = −0.40). But the global
+Data-Science-flavored resume (B) over the corpus, A wins *overall* by **2.21 points**
+(bootstrap BCa 95% CI [2.11, 2.32], Wilcoxon p underflows to 0; mSPRT p ≈ 8.5e-303, Cohen's *d* = −0.44). But the global
 verdict is the least interesting output: the **per-cluster** breakdown shows B decisively
-wins **Machine Learning / AI (+3.87 pts)** and **QA / Testing (+5.24 pts)** while A dominates
-Data Engineering, DevOps, Backend, and the rest. The product's real recommendation is not
-"send A" — it is *"send B for ML and QA roles, send A for infrastructure roles."* That
+wins **Machine Learning / AI (+3.78 pts)** and **DevOps / SRE / Cloud (+3.19 pts)** while A dominates
+Data Engineering, Backend, and the rest. The product's real recommendation is not
+"send A" — it is *"send B for ML and DevOps/cloud roles, send A for the rest."* That
 conditional, defensible answer is what separates this from a single-number resume scorer.
 
 A reader with only 90 seconds should read this section and Section 12 (the decision
@@ -117,7 +117,7 @@ peeked at the data first. The two-sided framing keeps the test honest about a po
 
 $$d_i = \mathrm{score}_B(i) - \mathrm{score}_A(i), \qquad \hat{d} = \frac{1}{N}\sum_{i=1}^{N} d_i$$
 
-A **paired** design is the right model because the same 2,000 jobs are scored by both
+A **paired** design is the right model because the same 9,014 jobs are scored by both
 resumes. To see why pairing matters, decompose each score into a *job effect* `g_i` (how
 matchable job *i* is, independent of which resume scores it) plus resume-specific noise
 `e_{X,i}`. An unpaired two-sample comparison would carry the variance of the job effects —
@@ -149,7 +149,7 @@ job population the snapshot represents:
 
 $$\mathrm{ATE} = \mathbb{E}_{i}\big[\mathrm{score}_B(i) - \mathrm{score}_A(i)\big],$$
 
-estimated by the sample mean of the per-job deltas over the 2,000 jobs. Two assumptions make
+estimated by the sample mean of the per-job deltas over the 9,014 jobs. Two assumptions make
 this clean: each job is scored independently of the others (no interference between units),
 and the snapshot is a fixed, representative draw from the market we care about. The second is
 the load-bearing assumption and is revisited as a limitation in Section 13 — a stale or
@@ -177,7 +177,7 @@ measure match by cosine similarity. Four deliberate choices matter:
 
    $$\cos(u, v) = \frac{u^\top v}{\lVert u\rVert\,\lVert v\rVert} = u^\top v \quad\text{when}\ \lVert u\rVert = \lVert v\rVert = 1,$$
 
-   so scoring 2 resumes against 2,000 jobs is a single `(2000×384)·(384,)` matrix-vector
+   so scoring 2 resumes against 9,014 jobs is a single `(9014×384)·(384,)` matrix-vector
    product — milliseconds on CPU, fully deterministic.
 4. **Cosine as a proxy.** Cosine similarity is a proxy for *textual* relevance, not for
    hiring outcomes. We state this limitation plainly (Section 13) rather than overclaim it
@@ -200,7 +200,7 @@ predictor — only a defensible, manipulable proxy for textual fit.
 resume-job pair jointly would likely score relevance more accurately, but it would require
 one forward pass per pair — 4,000 model calls per comparison — making the product slow,
 costly, and non-deterministic. The bi-encoder embeds each document once and reduces scoring
-to a dot product, so a full 2-resume-by-2,000-job comparison is a single matrix multiply that
+to a dot product, so a full 2-resume-by-9,014-job comparison is a single matrix multiply that
 runs in milliseconds on a free CPU host and returns the identical result every time. For a
 *relative* A/B contrast on a fixed corpus, that determinism and speed matter more than the
 last few points of absolute accuracy a cross-encoder would add.
@@ -209,10 +209,10 @@ last few points of absolute accuracy a cross-encoder would add.
 
 A single global verdict hides the most useful insight: a resume can win overall yet lose
 in the roles the candidate actually targets. This is a textbook **Simpson's-paradox** risk —
-an aggregate sign that reverses within subgroups. We therefore cluster the 2,000 job
+an aggregate sign that reverses within subgroups. We therefore cluster the 9,014 job
 embeddings with **K-means (k=8)** and label clusters from their dominant titles: *Data
 Engineering, Data & Analytics, Machine Learning / AI, DevOps / SRE / Cloud, Backend
-Engineering, Frontend / Mobile, Product Management, QA / Testing.* Clusters are computed
+Engineering, Frontend / Mobile, Product Management, Design / UX.* Clusters are computed
 once with a fixed seed and committed alongside the snapshot for reproducibility — the same
 labels ship with the data so the per-cluster analysis is identical for every user and every
 rerun.
@@ -226,10 +226,10 @@ smaller k merges genuinely different roles — collapsing, say, DevOps into Back
 re-hides exactly the role-level reversals we built stratification to expose.
 
 **Cluster sizes and per-cluster power.** The eight clusters are not equal in size — on the
-reference corpus the Data Engineering cluster alone holds about **370** of the 2,000 jobs,
+reference corpus the Data Engineering cluster alone holds about **798** of the 9,014 jobs,
 while others are leaner. This matters for the per-cluster tests in Section 11: a cluster's
-detectable effect scales as roughly `1/√n_cluster`, so a 370-job cluster resolves much
-smaller role-level effects than a 100-job one. We therefore read a non-significant
+detectable effect scales as roughly `1/√n_cluster`, so a 798-job cluster resolves much
+smaller role-level effects than a 313-job one. We therefore read a non-significant
 *small* cluster as "underpowered here," not "no effect," and lean on the FDR correction
 (rather than Bonferroni) precisely so that genuine effects in the smaller clusters are not
 crushed by an overly strict family-wise threshold.
@@ -288,12 +288,12 @@ $$\alpha_1 = \Phi\!\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{\alpha/2}}{1 - \hat{a}
 and the interval is read from the bootstrap distribution at `α1` and its upper counterpart.
 BCa is our **headline** interval because the percentile interval can be anti-conservative
 (too narrow) under skew, and embedding deltas are frequently skewed. On the reference run
-the BCa interval was [1.84, 2.30] points, comfortably excluding zero.
+the BCa interval was [2.11, 2.32] points, comfortably excluding zero.
 
-**Statistical vs practical significance.** At N = 2,000 the test is so well-powered that
+**Statistical vs practical significance.** At N = 9,014 the test is so well-powered that
 even a trivially small delta would register as "significant" — so significance alone is not
-the decision. We therefore foreground the *effect size*: the 2.08-point gap is a difference
-in cosine-similarity units (scaled x100 for display), and Cohen's *d* = -0.40 places it in
+the decision. We therefore foreground the *effect size*: the 2.21-point gap is a difference
+in cosine-similarity units (scaled x100 for display), and Cohen's *d* = -0.44 places it in
 the "medium" band, large enough to act on. The product never reports a p-value without its
 companion effect size and interval, precisely so a user is not misled into treating a
 statistically certain but practically negligible gap as a reason to switch resumes.
@@ -319,33 +319,33 @@ same power, a price we happily pay for not assuming a distribution we cannot gua
 
 # 7. Power Analysis
 
-With N = 2,000 paired observations, the design is highly powered. Power is the probability
+With N = 9,014 paired observations, the design is highly powered. Power is the probability
 of rejecting `H_0` when a true effect of a given size exists; reporting it converts a
 non-significant result from "no effect" into the sharper "no effect *we could have seen*."
 We report three things:
 
 - **Required N** for 80% power at the observed effect size. For the reference run's
-  `d = 0.40`, the two-sided requirement
-  `N ≈ ((z_{0.975} + z_{0.80})/d)^2 = (2.80/0.40)^2 ≈ 49` (≈ **52** with the small-sample
-  t-correction). In other words, 2,000 jobs is roughly **40× more** than this effect needed —
+  `d = 0.44`, the two-sided requirement
+  `N ≈ ((z_{0.975} + z_{0.80})/d)^2 = (2.80/0.44)^2 ≈ 41` (≈ **42** with the small-sample
+  t-correction). In other words, 9,014 jobs is over **200× more** than this effect needed —
   the design is nowhere near power-limited.
 - **Achieved power** at the observed effect. For large noncentrality, SciPy's noncentral-t
   saturates to NaN; we fall back to the large-sample normal approximation
   `power ≈ Φ(|d|√N − z_{1−α/2})`, which is effectively exact at this N and returns
   `power ≈ 1.00` on the reference run.
 - A **minimum detectable effect (MDE)** table in Cohen's *d* across an α × power grid. The
-  paired-design MDE is `d_MDE = (z_{1−α/2} + z_{power})/√N`; at N = 2,000:
+  paired-design MDE is `d_MDE = (z_{1−α/2} + z_{power})/√N`; at N = 9,014:
 
   | Power \\ α | 0.01 | 0.05 | 0.10 |
   |---|---|---|---|
-  | 0.80 | 0.076 | 0.063 | 0.056 |
-  | 0.90 | 0.086 | 0.072 | 0.065 |
-  | 0.95 | 0.094 | 0.081 | 0.074 |
+  | 0.80 | 0.036 | 0.030 | 0.026 |
+  | 0.90 | 0.041 | 0.034 | 0.031 |
+  | 0.95 | 0.044 | 0.038 | 0.035 |
 
 The table makes the design's resolution explicit: at the conventional α = 0.05 / power =
-0.80 cell, this corpus can detect an effect as small as **d ≈ 0.063**. Reporting it matters
+0.80 cell, this corpus can detect an effect as small as **d ≈ 0.030**. Reporting it matters
 most when a comparison comes back non-significant — it lets the product say "we could detect
-*d* ≥ 0.06 at 80% power; the observed *d* was 0.03," distinguishing a genuine null from an
+*d* ≥ 0.03 at 80% power; the observed *d* was 0.02," distinguishing a genuine null from an
 underpowered one, which a bare p-value never can.
 
 **Why the paired design is so powerful here.** The standard error of a paired mean scales
@@ -362,10 +362,10 @@ reach power `1 − β` against effect `d` at level `α`:
 
 $$N \approx \left(\frac{z_{1-\alpha/2} + z_{1-\beta}}{d}\right)^2.$$
 
-For the reference run's `d = 0.40` at α = 0.05, power 0.80, this normal approximation returns
-`N ≈ 49`; the engine's exact noncentral-t computation reports **52** — the small handful of
+For the reference run's `d = 0.44` at α = 0.05, power 0.80, this normal approximation returns
+`N ≈ 41`; the engine's exact noncentral-t computation reports **42** — the small handful of
 extra observations the t-correction adds at modest N. Either way the message is identical: a
-medium effect needs only dozens of jobs, so 2,000 leaves the design power-saturated, and any
+medium effect needs only dozens of jobs, so 9,014 leaves the design power-saturated, and any
 non-significant verdict is therefore a statement about effect *size*, never about
 insufficient data.
 
@@ -392,7 +392,7 @@ of the covariate regression.
 
 **A correction to the naive covariate choice.** The original project spec named
 *resume-level* covariates (resume length, skill density). These are **constant across the
-2,000 jobs** for a fixed resume pair, so they have zero variance over the unit of analysis
+9,014 jobs** for a fixed resume pair, so they have zero variance over the unit of analysis
 and cannot reduce per-job delta variance — including them does literally nothing. The unit
 of observation is a *job*, so the covariates must vary across jobs **and** be independent of
 the A-vs-B contrast (otherwise the adjustment would bias the estimate). We therefore use
@@ -403,12 +403,12 @@ interval. These covariates are valid because they are properties of the *job*, f
 and independent of which resume is being scored, satisfying CUPED's pre-experiment
 requirement.
 
-**Worked result.** On the reference run the covariate regression achieved `R² = 0.549`, i.e.
-a **54.9% variance reduction**. The effective-sample-size multiplier is
+**Worked result.** On the reference run the covariate regression achieved `R² = 0.500`, i.e.
+a **50.0% variance reduction**. The effective-sample-size multiplier is
 
-$$\frac{1}{1 - R^2} = \frac{1}{1 - 0.549} \approx 2.22,$$
+$$\frac{1}{1 - R^2} = \frac{1}{1 - 0.500} \approx 2.00,$$
 
-so the adjusted estimate is as precise as one from roughly **2.22×** the data. We document
+so the adjusted estimate is as precise as one from roughly **2.00×** the data. We document
 this deviation from the spec openly because an interviewer *should* ask "why those
 covariates?" — and the honest, correct answer (constant covariates reduce nothing; the unit
 is a job) is stronger than a plausible-but-wrong one.
@@ -428,9 +428,9 @@ minimized at `θ* = Cov(d,X)/Var(X)`; substituting back leaves `Var(d)·(1 − �
 fractional variance removed is exactly `ρ² = R²`. With several covariates `ρ²` becomes the
 regression's multiple `R²`.
 
-**What 54.9% buys, concretely.** A confidence interval's half-width scales with the standard
-deviation, i.e. with `√Var`. Cutting variance by 54.9% leaves `√(1 − 0.549) = √0.451 ≈ 0.67`
-of the original width — a roughly **33% narrower** interval from the very same 2,000 jobs.
+**What 50.0% buys, concretely.** A confidence interval's half-width scales with the standard
+deviation, i.e. with `√Var`. Cutting variance by 50.0% leaves `√(1 − 0.500) = √0.500 ≈ 0.71`
+of the original width — a roughly **29% narrower** interval from the very same 9,014 jobs.
 That is the practical payoff of residualizing on cluster structure: a sharper estimate at
 zero additional data cost.
 
@@ -458,10 +458,10 @@ constraint on when or how often you look. The mixture width `τ` trades early se
 against asymptotic efficiency — a wider prior detects large effects sooner; a narrower one
 is more powerful against small effects.
 
-In the static-snapshot product all 2,000 jobs are scored at once, so mSPRT is not an
+In the static-snapshot product all 9,014 jobs are scored at once, so mSPRT is not an
 operational stopping rule here; we display it as a "valid at any sample size" alternative
 p-value and plot its trajectory across the accumulating jobs. On the reference run it
-returns an always-valid `p ≈ 3e-67` (reject). Its real value in this product is conceptual
+returns an always-valid `p ≈ 8.5e-303` (reject). Its real value in this product is conceptual
 honesty about peeking — and it is a genuine differentiator in a Product Analyst interview,
 where most candidates have never implemented one. We verify the implementation by
 simulation: across many null runs the empirical "ever reject" rate stays at or below α.
@@ -494,22 +494,22 @@ $$p \sim \mathrm{Beta}(1,1), \qquad p \mid \text{data} \sim \mathrm{Beta}(1+k,\ 
 
 The `Beta(1,1)` prior is uniform on [0, 1] — maximally non-committal about the win rate.
 (A Jeffreys `Beta(0.5, 0.5)` prior is an equally defensible reference choice; at
-N = 2,000 the data overwhelm either prior, so the posterior is effectively likelihood-driven
+N = 9,014 the data overwhelm either prior, so the posterior is effectively likelihood-driven
 and the choice is immaterial.) Conjugacy means the posterior is again a Beta, with a
 closed-form mean `(1+k)/(2+N)` and exact quantiles for the credible interval — no MCMC
 required.
 
-**Worked result.** On the reference run `k = 590` of `N = 2,000` jobs favored B, so the
-posterior is `Beta(591, 1411)` with mean
+**Worked result.** On the reference run `k = 2,508` of `N = 9,014` jobs favored B, so the
+posterior is `Beta(2509, 6507)` with mean
 
-$$\frac{1 + 590}{2 + 2000} = \frac{591}{2002} \approx 0.295,$$
+$$\frac{1 + 2508}{2 + 9014} = \frac{2509}{9016} \approx 0.278,$$
 
-a 95% credible interval of roughly [0.275, 0.315], and `P(p > 0.5 | data) ≈ 0` — B beats A
+a 95% credible interval of roughly [0.269, 0.288], and `P(p > 0.5 | data) ≈ 0` — B beats A
 on under 30% of jobs and the probability it wins *more often than not* is negligible. The
 Bayesian posterior and the frequentist test agree (both say A is the global winner), as they
-nearly always will at N = 2,000, but the posterior communicates **uncertainty as
+nearly always will at N = 9,014, but the posterior communicates **uncertainty as
 probability** — "B wins about 30% of jobs, and we are confident it is below half" — which is
-far more natural for a non-technical user than a p-value of 7e-75. Note this win-*rate*
+far more natural for a non-technical user than a p-value of 8.5e-303. Note this win-*rate*
 question (Section 10) is distinct from the win-*magnitude* question (Sections 6–8): a resume
 could win a slim majority of jobs by tiny margins yet lose on average, or vice versa, so we
 report both.
@@ -518,10 +518,10 @@ report both.
 
 $$\mathrm{Var}(p \mid \text{data}) = \frac{(1+k)(1+N-k)}{(2+N)^2\,(3+N)},$$
 
-which at `k = 590, N = 2,000` is tiny — the credible interval [0.275, 0.315] is barely four
+which at `k = 2,508, N = 9,014` is tiny — the credible interval [0.269, 0.288] is under two
 points wide. The value of the Bayesian layer is not a different verdict (it agrees with the
 frequentist test) but a different *language*: a product manager can act on "B wins about 30%
-of jobs, near-certainly under half" without parsing a p-value of 7e-75. And because the
+of jobs, near-certainly under half" without parsing a p-value of 8.5e-303. And because the
 win-rate question is orthogonal to the win-magnitude question, reporting the posterior
 alongside the mean-delta test guards against the trap of a resume that wins many jobs by a
 sliver yet loses on average.
@@ -590,7 +590,7 @@ resampling interval before declaring a winner. Confidence is then graded by comb
 frequentist and Bayesian extremity, and the per-cluster table tells the user *where* to
 trust the headline.
 
-**When the methods disagree.** At N = 2,000 the frequentist test and the Bayesian posterior
+**When the methods disagree.** At N = 9,014 the frequentist test and the Bayesian posterior
 almost always point the same way, but the framework is explicit about the exceptions —
 typically a borderline effect where the test clears p < 0.05 yet the win-rate posterior
 straddles 0.5, or the bootstrap interval grazes zero. There the conjunction rule (significant
@@ -599,16 +599,16 @@ the product says "leaning, not conclusive" rather than forcing a winner. Disagre
 methods is treated as information about uncertainty, not a contradiction to be hidden.
 
 **Worked example (reference run on a sample resume pair).** Comparing a DevOps-flavored
-Resume A against a Data-Science-flavored Resume B over the 2,000-job corpus produced: Resume
-A wins overall by **2.08 points** (BCa 95% CI [1.84, 2.30]). The normality gate rejected
-normality, so the engine auto-selected the **Wilcoxon** test (p ≈ 7e-75); Cohen's *d* =
-−0.40, achieved power ≈ 1.00. CUPED cut variance by **54.9%** (effective N ×2.22), driven by
-between-cluster structure. mSPRT's always-valid p ≈ 3e-67 (reject). The Bayesian posterior
-put the per-job B-win rate at ≈ 0.295 with `P(p > 0.5) ≈ 0`. Crucially, the **per-cluster**
-view inverted the headline where it counts: **B won Machine Learning / AI (+3.87 pts)** and
-**QA / Testing (+5.24 pts)**, while A dominated Data Engineering, DevOps / SRE / Cloud,
-Backend Engineering, and the remaining clusters. The resulting recommendation — *"send B for
-ML and QA roles, send A for infrastructure roles"* — is the entire point of the product, and
+Resume A against a Data-Science-flavored Resume B over the 9,014-job corpus produced: Resume
+A wins overall by **2.21 points** (BCa 95% CI [2.11, 2.32]). The normality gate rejected
+normality, so the engine auto-selected the **Wilcoxon** test (p underflows to 0); Cohen's *d* =
+−0.44, achieved power ≈ 1.00. CUPED cut variance by **50.0%** (effective N ×2.00), driven by
+between-cluster structure. mSPRT's always-valid p ≈ 8.5e-303 (reject). The Bayesian posterior
+put the per-job B-win rate at ≈ 0.278 with `P(p > 0.5) ≈ 0`. Crucially, the **per-cluster**
+view inverted the headline where it counts: **B won Machine Learning / AI (+3.78 pts)** and
+**DevOps / SRE / Cloud (+3.19 pts)**, while A dominated Data Engineering, Data & Analytics,
+Backend Engineering, Frontend / Mobile, Product Management, and Design / UX. The resulting recommendation — *"send B for
+ML and DevOps/cloud roles, send A for the rest"* — is the entire point of the product, and
 it is one that no single global number could ever have produced.
 
 **What "tie" and "confidence" mean to the user.** A *tie* is not a failure of the test — it
@@ -642,7 +642,7 @@ not an artifact of one library's defaults.
   comparison, not universal constants. Different pairs yield different numbers — which is
   why the product recomputes everything per upload and the case-study figures are labeled as
   a reference run, not a benchmark.
-- **Snapshot recency.** The corpus is a fixed 2,000-job snapshot; the labor market drifts. A
+- **Snapshot recency.** The corpus is a fixed 9,014-job snapshot; the labor market drifts. A
   scheduled refresh (inherited from JobAtlas) mitigates but does not eliminate staleness, and
   cluster boundaries can shift when the snapshot is rebuilt.
 - **No recruiter-side validation.** We never observe whether higher-scoring resumes actually

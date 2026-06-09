@@ -33,18 +33,30 @@ def main() -> None:
     print("VERDICT:", rep.verdict.headline)
     print(f"  winner={rep.verdict.winner}  confidence={rep.verdict.confidence}")
     print("-" * 70)
-    print(f"mean score  A={s['mean_a']:.4f}  B={s['mean_b']:.4f}  "
-          f"delta={s['mean_delta']:+.4f}  (B wins {s['pct_jobs_b_wins']:.1f}% of jobs)")
-    print(f"effect      Cohen d={rep.cohens_d:.3f}  achieved power={rep.achieved_power:.3f}  "
-          f"required N@80%={rep.required_n_80:.0f}")
-    print(f"bootstrap   BCa 95% CI [{rep.bootstrap.bca_low*100:+.2f}, "
-          f"{rep.bootstrap.bca_high*100:+.2f}] points")
-    print(f"CUPED       variance reduction={rep.cuped.variance_reduction*100:.1f}%  "
-          f"(effective N x{rep.cuped.effective_n_multiplier:.2f})")
-    print(f"mSPRT       always-valid p={rep.sequential.always_valid_p:.3g}  "
-          f"reject H0={rep.sequential.reject_h0}")
-    print(f"Bayes       P(B>A per job)={rep.bayes.prob_b_beats_a:.3f}  "
-          f"95% CrI [{rep.bayes.ci_low:.3f}, {rep.bayes.ci_high:.3f}]")
+    print(
+        f"mean score  A={s['mean_a']:.4f}  B={s['mean_b']:.4f}  "
+        f"delta={s['mean_delta']:+.4f}  (B wins {s['pct_jobs_b_wins']:.1f}% of jobs)"
+    )
+    print(
+        f"effect      Cohen d={rep.cohens_d:.3f}  achieved power={rep.achieved_power:.3f}  "
+        f"required N@80%={rep.required_n_80:.0f}"
+    )
+    print(
+        f"bootstrap   BCa 95% CI [{rep.bootstrap.bca_low * 100:+.2f}, "
+        f"{rep.bootstrap.bca_high * 100:+.2f}] points"
+    )
+    print(
+        f"CUPED       variance reduction={rep.cuped.variance_reduction * 100:.1f}%  "
+        f"(effective N x{rep.cuped.effective_n_multiplier:.2f})"
+    )
+    print(
+        f"mSPRT       always-valid p={rep.sequential.always_valid_p:.3g}  "
+        f"reject H0={rep.sequential.reject_h0}"
+    )
+    print(
+        f"Bayes       P(B>A per job)={rep.bayes.prob_b_beats_a:.3f}  "
+        f"95% CrI [{rep.bayes.ci_low:.3f}, {rep.bayes.ci_high:.3f}]"
+    )
     print("-" * 70)
     print("Per-cluster (BH-FDR corrected):")
     view = rep.per_cluster[["label", "n", "mean_delta", "p_bh_fdr", "winner"]].copy()

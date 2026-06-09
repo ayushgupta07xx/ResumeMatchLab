@@ -56,8 +56,7 @@ def test_msprt_controls_type_i_error():
     # so we check the aggregate error rate, not one sequence.
     sims = 300
     rejects = sum(
-        msprt(make_deltas(0.0, 0.1, 1000, seed=1000 + s), alpha=0.05).reject_h0
-        for s in range(sims)
+        msprt(make_deltas(0.0, 0.1, 1000, seed=1000 + s), alpha=0.05).reject_h0 for s in range(sims)
     )
     assert rejects / sims <= 0.08  # ~alpha = 0.05 with Monte Carlo slack
 

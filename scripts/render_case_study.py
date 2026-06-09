@@ -27,12 +27,33 @@ TECTONIC = str(HOME / "rrenv" / "bin" / "tectonic")
 # Unicode -> ASCII for symbols that appear in prose / inline-code (not in the
 # ASCII-LaTeX math blocks, which are left untouched).
 REPL = {
-    "−": "-", "×": "x", "·": ".", "≈": "~=", "≥": ">=", "≤": "<=",
-    "√": "sqrt ", "≠": "!=", "→": "->",
-    "α": "alpha", "β": "beta", "μ": "mu", "σ": "sigma", "τ": "tau",
-    "ρ": "rho", "θ": "theta", "η": "eta", "ε": "eps", "λ": "lambda",
-    "Φ": "Phi", "Λ": "Lambda", "Δ": "Delta",
-    "²": "^2", "³": "^3", "₀": "_0", "₁": "_1", "₂": "_2",
+    "−": "-",
+    "×": "x",
+    "·": ".",
+    "≈": "~=",
+    "≥": ">=",
+    "≤": "<=",
+    "√": "sqrt ",
+    "≠": "!=",
+    "→": "->",
+    "α": "alpha",
+    "β": "beta",
+    "μ": "mu",
+    "σ": "sigma",
+    "τ": "tau",
+    "ρ": "rho",
+    "θ": "theta",
+    "η": "eta",
+    "ε": "eps",
+    "λ": "lambda",
+    "Φ": "Phi",
+    "Λ": "Lambda",
+    "Δ": "Delta",
+    "²": "^2",
+    "³": "^3",
+    "₀": "_0",
+    "₁": "_1",
+    "₂": "_2",
 }
 
 
@@ -43,9 +64,9 @@ def main() -> None:
     TMP.write_text(text, encoding="utf-8")
 
     result = subprocess.run(
-        [PANDOC, str(TMP), "-o", str(PDF), f"--pdf-engine={TECTONIC}",
-         "-V", "geometry:margin=1in"],
-        capture_output=True, text=True,
+        [PANDOC, str(TMP), "-o", str(PDF), f"--pdf-engine={TECTONIC}", "-V", "geometry:margin=1in"],
+        capture_output=True,
+        text=True,
     )
     print("STDOUT:", result.stdout[-1500:])
     print("STDERR:", result.stderr[-2500:])
