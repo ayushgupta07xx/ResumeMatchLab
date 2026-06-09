@@ -1,0 +1,37 @@
+RAHUL MENON
+DevOps / Site Reliability Engineer — Bengaluru, India
+
+SUMMARY
+Site Reliability and DevOps engineer with 6 years building and operating
+cloud-native infrastructure at scale. Owns CI/CD, observability, and incident
+response for high-traffic platforms. Comfortable on-call; obsessive about SLOs,
+error budgets, and cutting toil through automation.
+
+SKILLS
+Kubernetes, Docker, Terraform, AWS (EKS, EC2, S3, IAM, CloudWatch), GCP,
+Helm, ArgoCD, Jenkins, GitHub Actions, GitLab CI, Prometheus, Grafana,
+Loki, ELK, Ansible, Linux, Bash, Python, Go, Istio service mesh, Vault.
+
+EXPERIENCE
+Senior SRE, FinTech Platform (2021–present)
+- Migrated 40+ microservices to Kubernetes (EKS); cut deploy time 70% with
+  ArgoCD GitOps and Helm charts.
+- Built Prometheus/Grafana observability stack with SLO-based alerting and
+  error budgets; reduced p95 latency 35% and paging volume 50%.
+- Authored Terraform modules provisioning multi-account AWS landing zones;
+  enforced policy-as-code with OPA.
+- Led incident response and blameless postmortems; improved MTTR from 45 to
+  12 minutes.
+
+DevOps Engineer, E-commerce (2018–2021)
+- Implemented CI/CD with Jenkins and GitHub Actions; containerized legacy
+  monolith and introduced blue-green deploys.
+- Set up centralized logging (ELK) and autoscaling; handled 5x festival-season
+  traffic with zero downtime.
+
+EDUCATION
+B.Tech, Computer Science — NIT Trichy
+
+CERTIFICATIONS
+Certified Kubernetes Administrator (CKA), AWS Solutions Architect Associate,
+HashiCorp Terraform Associate.

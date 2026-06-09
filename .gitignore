@@ -1,0 +1,26 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.cache/
+huggingface/
+.quarto/
+docs/methodology/_case_study.render.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NOTE: data/jobs_snapshot/*.parquet and embeddings/*.parquet are committed on
+# purpose — the pre-built snapshot IS the product and keeps the app offline.

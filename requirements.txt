@@ -1,0 +1,40 @@
+# ResumeMatch Lab — runtime dependencies
+# CPU-only PyTorch wheels (Streamlit Community Cloud / HF Spaces have no GPU).
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Core data
+numpy
+pandas
+pyarrow
+
+# Embeddings & similarity (embeds the user's two resumes at request time;
+# the 2,000-job corpus ships pre-embedded in embeddings/jobs_cache.parquet)
+torch==2.12.0+cpu
+sentence-transformers
+
+# Statistical engine
+scipy
+statsmodels
+scikit-learn
+pingouin
+
+# Resume parsing (triple fallback)
+pdfplumber
+pymupdf
+python-docx
+
+# App & visualization
+streamlit
+plotly
+matplotlib
+
+# PDF report + product analytics
+reportlab
+posthog
+
+# Typed models
+pydantic
+
+# Snapshot build only (scripts/export_from_jobatlas.py) — harmless at runtime
+SQLAlchemy
+psycopg[binary]

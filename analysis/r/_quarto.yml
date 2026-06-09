@@ -1,0 +1,9 @@
+project:
+  title: "ResumeMatch Lab — R validation"
+  type: default
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    embed-resources: true

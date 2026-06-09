@@ -1,0 +1,116 @@
+---
+title: "ResumeMatch Lab — Parallel Statistical Validation (R)"
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+## Purpose
+
+This notebook reproduces ResumeMatch Lab's **entire statistical pipeline in R**, on the
+*identical* paired-delta vector exported from the Python engine
+(`analysis/r/demo_deltas.csv`, written by `scripts/export_demo_deltas.py`). If Python and R
+agree on the same data, the statistics are implementation-independent. The tolerance table
+lives in `docs/python-vs-r.md`.
+
+## Setup
+
+```{r}
+#| label: setup
+library(readr)
+library(dplyr)
+library(boot)
+library(pwr)
+
+d <- read_csv("demo_deltas.csv", show_col_types = FALSE)
+delta <- d$delta
+n <- length(delta)
+n
+```
+
+## 1. Effect size & frequentist tests (normality-gated)
+
+```{r}
+mean_delta <- mean(delta)
+cohens_d <- mean_delta / sd(delta)
+
+# Mirror the Shapiro-Wilk gate (R caps the test at n = 5000).
+samp <- if (n > 5000) sample(delta, 5000) else delta
+shapiro_p <- shapiro.test(samp)$p.value
+
+t_res <- t.test(delta, mu = 0)                       # paired t == one-sample on delta
+w_res <- wilcox.test(delta, mu = 0, exact = FALSE, correct = FALSE)
+
+list(mean_delta = mean_delta, cohens_d = cohens_d, shapiro_p = shapiro_p,
+     t_p = t_res$p.value, wilcox_p = w_res$p.value)
+```
+
+## 2. Bootstrap CI — 10,000 resamples, percentile + BCa
+
+```{r}
+set.seed(42)
+bs <- boot(delta, statistic = function(x, i) mean(x[i]), R = 10000)
+boot.ci(bs, type = c("perc", "bca"))
+```
+
+## 3. Power analysis
+
+```{r}
+achieved_power <- pwr.t.test(n = n, d = abs(cohens_d), sig.level = 0.05,
+                             type = "one.sample")$power
+required_n_80 <- pwr.t.test(d = abs(cohens_d), sig.level = 0.05, power = 0.8,
+                            type = "one.sample")$n
+c(achieved_power = achieved_power, required_n_80 = required_n_80)
+```
+
+## 4. CUPED — lm() residualization on job-side covariates
+
+```{r}
+m <- lm(delta ~ factor(cluster_id) + scale(desc_len), data = d)
+variance_reduction <- summary(m)$r.squared            # == 1 - var(resid)/var(delta)
+variance_reduction
+```
+
+## 5. mSPRT — Robbins mixture, always-valid p-value
+
+```{r}
+s2 <- var(delta); tau2 <- s2
+ns <- seq_len(n); xbar <- cumsum(delta) / ns
+lambda <- sqrt(s2 / (s2 + ns * tau2)) *
+          exp((ns^2 * tau2 * xbar^2) / (2 * s2 * (s2 + ns * tau2)))
+always_valid_p <- cummin(pmin(1, 1 / lambda))
+tail(always_valid_p, 1)
+```
+
+## 6. Bayesian Beta-Binomial posterior
+
+```{r}
+k <- sum(delta > 0)
+post_a <- 1 + k; post_b <- 1 + n - k
+list(k = k,
+     posterior_mean = post_a / (post_a + post_b),
+     credible_interval = qbeta(c(0.025, 0.975), post_a, post_b),
+     prob_b_beats_a = 1 - pbeta(0.5, post_a, post_b))
+```
+
+## 7. Per-cluster tests + multiple-comparison correction
+
+```{r}
+per <- d %>%
+  group_by(cluster_id, cluster_label) %>%
+  summarise(n = n(), mean_delta = mean(delta),
+            p_raw = t.test(delta, mu = 0)$p.value, .groups = "drop")
+per$p_bonferroni <- p.adjust(per$p_raw, method = "bonferroni")
+per$p_bh         <- p.adjust(per$p_raw, method = "BH")
+per
+```
+
+## Reproducibility
+
+Identical input vector to Python, `set.seed(42)` for the bootstrap. Render with
+`quarto render analysis/r/compare.qmd`. Compare the printed values against the Python
+reference in `docs/python-vs-r.md`.

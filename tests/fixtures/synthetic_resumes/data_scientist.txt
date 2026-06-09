@@ -1,0 +1,33 @@
+RAHUL MENON
+Data Scientist / Machine Learning Engineer — Bengaluru, India
+
+SUMMARY
+Data scientist with 6 years turning messy data into shipped ML products.
+Strength in NLP, recommender systems, and experimentation. Comfortable owning a
+model from problem framing and EDA through training, evaluation, and serving.
+
+SKILLS
+Python, pandas, NumPy, scikit-learn, PyTorch, TensorFlow, Hugging Face
+Transformers, NLP, embeddings, LLMs, XGBoost, SQL, Spark, A/B testing,
+causal inference, statistics, hypothesis testing, MLflow, Airflow, Docker,
+FastAPI, feature engineering, time-series forecasting.
+
+EXPERIENCE
+Senior Data Scientist, Consumer Tech (2021–present)
+- Built a transformer-based semantic search and recommendation system
+  (sentence-transformers + FAISS) lifting click-through 18%.
+- Designed and analyzed A/B tests with CUPED variance reduction and Bayesian
+  decision rules; partnered with PMs on rollout decisions.
+- Trained and deployed churn and LTV models (XGBoost) served via FastAPI;
+  monitored drift with MLflow.
+
+Data Scientist, Healthcare Analytics (2018–2021)
+- Developed NLP pipelines extracting structured fields from clinical notes
+  (spaCy, BERT) with 0.92 F1.
+- Built time-series demand forecasts (Prophet, ARIMA) reducing stockouts 22%.
+
+EDUCATION
+M.Sc. Statistics — Indian Statistical Institute; B.Sc. Mathematics
+
+PUBLICATIONS
+Co-authored a workshop paper on domain-adaptive text embeddings.
