@@ -35,6 +35,11 @@ posthog
 # Typed models
 pydantic
 
+# API layer (FastAPI backend on Hugging Face Spaces — used by apps/api/)
+fastapi
+uvicorn[standard]
+python-multipart
+
 # Snapshot build only (scripts/export_from_jobatlas.py) — harmless at runtime
 SQLAlchemy
 psycopg[binary]

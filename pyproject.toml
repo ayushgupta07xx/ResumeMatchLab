@@ -12,7 +12,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "W"]
-ignore = ["E501"]  # long lines are fine in docstrings/equations
+ignore = ["E501", "B008"]  # E501: long math lines; B008: FastAPI Depends/File/Form defaults
 
 [tool.mypy]
 python_version = "3.11"

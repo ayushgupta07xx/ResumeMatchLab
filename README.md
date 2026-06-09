@@ -88,6 +88,7 @@ core/        types, corpus loader, resume↔job scoring
 parsers/     PDF (pdfplumber→pymupdf) / DOCX / TXT with quality flags
 stats/       frequentist · power · cuped · sequential · bayesian · multiple_comparisons · engine
 apps/frontend/  Streamlit app + Plotly charts + PDF report + PostHog analytics
+apps/api/    FastAPI backend (shared engine) for a custom React/Next.js frontend
 analysis/r/  parallel implementation in R (Quarto) for cross-language validation
 docs/        methodology case study · architecture · ADRs · business package
 scripts/     export_from_jobatlas.py · smoke_demo.py
@@ -100,6 +101,20 @@ Instrumented with **PostHog** (events, funnels, cohorts, a North-Star metric, an
 feature-flagged A/B test on the results-page layout — *we A/B test the A/B testing tool*).
 Only anonymous metadata is sent; raw resume text never leaves the process. See
 [docs/analytics.md](docs/analytics.md) and [docs/experiments/layout-v2.md](docs/experiments/layout-v2.md).
+
+## 🔌 API (one engine, any frontend)
+
+The statistical engine is UI-agnostic and exposed via **FastAPI** (`apps/api/`), so the
+Streamlit analyst app and a polished React/Next.js product UI run off **one source of truth**:
+
+- `GET /health` — corpus + model info
+- `POST /compare` — two resume files (multipart) → full JSON report
+- `POST /compare/text` — `{resume_a, resume_b}` JSON → full JSON report
+
+The response includes everything a UI needs to render the verdict and every chart
+(forest plot, distributions, Bayesian posterior, mSPRT trajectory) — no client-side math.
+Run locally with `uvicorn apps.api.main:app --reload`; deploy on Hugging Face Spaces via
+`apps/api/Dockerfile`.
 
 ## 🔒 Privacy
 
