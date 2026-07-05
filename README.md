@@ -15,8 +15,8 @@ confidence, and *in which job clusters*. Not generic ATS keyword scoring: a real
 experiment against **9,014 live job postings**, with frequentist, Bayesian, and sequential
 inference.
 
-> **Verdict example:** *"Resume A wins by 2.21 points (95% CI [2.11, 2.32], p < 0.001).
-> But B wins **Machine Learning / AI** by +3.78 — send B for ML and DevOps roles, A for the rest."*
+> **Verdict example:** *"Resume A wins by 2.01 points (95% CI [1.91, 2.12], p < 0.001).
+> But B wins **Machine Learning / AI** by +3.54 — send B for ML and DevOps roles, A for the rest."*
 
 ---
 
@@ -38,7 +38,7 @@ Every analysis runs on the per-job paired delta `dᵢ = score_B(i) − score_A(i
 - **Frequentist** — paired t-test / Wilcoxon, auto-selected by a Shapiro-Wilk normality gate
 - **Effect size & CI** — Cohen's *d*; 10,000-resample **bootstrap** with percentile + **BCa** intervals
 - **Power** — required N, achieved power, and a minimum-detectable-effect (MDE) table
-- **CUPED** — regression-based variance reduction on job-side covariates (~**50%** reduction in the demo run → effective N ×2.0)
+- **CUPED** — regression-based variance reduction on job-side covariates (~**44%** reduction in the demo run → effective N ×1.78)
 - **mSPRT** — Robbins mixture sequential test → **always-valid p-values** (peek any time)
 - **Bayesian** — Beta-Binomial posterior of `P(B beats A on a job)` with credible interval
 - **Multiple comparisons** — per-cluster tests with **Bonferroni** + **Benjamini-Hochberg FDR**

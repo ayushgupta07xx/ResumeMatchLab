@@ -26,7 +26,7 @@ rendered `compare.qmd`), both on the identical `demo_deltas.csv` (N = 9,014).
 | Wilcoxon p-value | 0 (underflow) | 0 (underflow) | both → 0 ✓ |
 | Bootstrap BCa 95% CI | [−0.0231541, −0.0210872] | [−0.0231476, −0.0210524] | < 0.2% (Monte-Carlo) ✓ |
 | CUPED variance reduction (R²) | 0.5002721874 | 0.5002721872 | < 1e-8 ✓ |
-| Bayes wins k (of 9014) | 2508 | 2508 | exact ✓ |
+| Bayes wins k (of 9014) | 2578 | 2578 | exact ✓ |
 | Bayes P(B>A per job) | 0 (underflow) | 0 (pbeta underflow) | both ≈ 0 ✓ |
 | mSPRT always-valid p | 8.4976e-303 | 0 (underflow) | both ≈ 0 ✓ |
 | Achieved power | 1.000 | 1.000 | exact ✓ |
@@ -34,7 +34,7 @@ rendered `compare.qmd`), both on the identical `demo_deltas.csv` (N = 9,014).
 Every deterministic estimate agrees to ≤ 1e-8; the stochastic bootstrap agrees to within
 ~0.2% (well inside the 1% Monte-Carlo tolerance). The only nominal "differences" are in the
 deep tails — both languages' Wilcoxon and mSPRT p-values underflow toward 0 (SciPy retains
-8.5e-303 for the mSPRT p; R prints exactly 0) — all effectively zero. **The statistics are
+9.1e-303 for the mSPRT p; R prints exactly 0) — all effectively zero. **The statistics are
 implementation-independent.**
 
 ## Why these should match

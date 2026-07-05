@@ -78,3 +78,44 @@ interactive app.
 **Decision.** Resumes are processed in memory only, never persisted; PostHog receives
 metadata only.
 **Consequences.** A defensible privacy story; analytics functions are no-ops without a key.
+
+## ADR-13: Whole-document cosine scoring — known breadth bias, no practical-significance floor
+
+**Status:** Accepted
+
+**Context**
+Stress-testing the live `/compare` endpoint with two near-duplicate résumé versions (a DevOps-specialist CV vs. a generalist CV sharing ~90% of their text) surfaced behaviour that reads as wrong but is arithmetically correct and reproducible:
+- The DevOps CV scored *lower* on the DevOps/SRE/Cloud cluster than the generalist CV (Δ +0.88pp, BH-FDR p≈0) and *higher* on Frontend/ML/Design.
+- Every per-cluster gap was significant (cluster N = 313–1,590; CIs clear of zero) yet tiny in absolute terms (0.1–2.0pp on a ~62pp base). Overall Δ −0.30pp, p≈10⁻⁸³.
+
+Root causes:
+1. **Near-duplicate inputs.** When two résumés share most of their text, the paired per-job deltas have near-zero variance, so absolute gaps collapse to sub-2pp while Cohen's d stays moderate-to-large (DevOps cluster d≈0.86; overall d≈0.22). Significance and effect size both look "real"; absolute magnitude does not.
+2. **Whole-document mean-pooled cosine rewards breadth over specialisation.** A specialist CV dense with niche jargon (multi-burn-rate alerting, ServerSideApply) sits *farther* from the centroid of generically-worded postings than a generalist CV that covers the same tools in plainer language plus broad SWE vocabulary. The per-cluster sign tracks proximity-to-JD-centroid, not recruiter-style domain fit.
+
+**Decision**
+1. **No practical-significance floor on the verdict or forest.** A Cohen's-d floor is the wrong lever — low within-pair variance inflates d, so it would grey out nothing. An absolute-pp floor has no principled anchor: the product scores only two résumés against the corpus and has no résumé-score population to calibrate "meaningful," so any threshold is arbitrary and indefensible.
+2. **Keep mean-pooled whole-document cosine** as the scorer, and **document its breadth bias** in the public methodology (`/how-it-works`): per-cluster signs are directional, not a recruiter verdict.
+3. **Defer** a domain-fit-aware scorer (per-skill max-similarity / late-interaction, or a cross-encoder rerank) to a separate change — it re-baselines every published figure and needs full re-validation. Tracked as future work, not done here.
+
+**Consequences**
+- The forest stays honest about *magnitude* (real CIs, real signs) but is explicitly framed as embedding-similarity, not fit.
+- Two near-identical résumé versions correctly return a near-coin-flip win rate; the product never claims a large difference where none exists.
+- The breadth-bias limitation is a documented known issue, not a silent flaw — and a defensible interview talking point.
+
+
+## ADR-14: Chunk max-sim scorer shipped; skill-overlap blend rejected; per-cluster claim reframed
+
+**Status:** Accepted (supersedes ADR-13's "keep mean-pooled cosine" decision)
+
+**Context**
+ADR-13 documented the breadth bias of whole-document mean-pooled cosine and deferred the fix. This change ships the fix and records what was and was not adopted, using the canonical DevOps-specialist (A) vs data-scientist (B) reference pair.
+
+**Decision**
+1. **Ship asymmetric chunk max-sim.** `core/scoring.py` embeds each resume as `(C, 384)` line/bullet chunks and scores every job against the resume's best-matching chunk (`(jobs @ chunks.T).max(axis=1)`), replacing the single mean-pooled vector. A specialist bullet now lifts its own resume instead of being averaged toward the corpus centroid.
+2. **Reject the skill-overlap blend.** An `alpha*chunk_maxsim + (1-alpha)*skill_overlap` blend was evaluated across alpha 1.0 -> 0.2. Every alpha left DevOps / SRE / Cloud favouring the broad resume, and pure skill-overlap favoured it *more* — so no alpha flips the cluster without target-fitting a predetermined result. Rejected as unprincipled; not shipped.
+3. **Reframe the per-cluster claim.** "A specialist tops its own cluster" is false for a K-means *macro*-cluster. A probe of DevOps / SRE / Cloud (826 jobs) found the specialist wins the pure-infrastructure JDs (10 jobs, overlap 0.636 vs 0.438) but the cluster is ~92% mixed cloud / data-platform roles the data-scientist resume legitimately matches. Honest claim: max-sim removes the mean-pool centroid bias and the specialist wins its pure-role JDs; a heterogeneous cluster mean reflects its dominant sub-population.
+
+**Consequences**
+- Canonical Numbers re-baselined to the max-sim run: A wins 2.01 pts (BCa [1.91, 2.12]); per-cluster ML/AI +3.54, DevOps/SRE/Cloud +3.60; CUPED 43.8% (effective N x1.78); Bayes k=2,578. README, case study, example-verdict, and /how-it-works were updated in the same change.
+- `/how-it-works` now describes best-matching-chunk scoring and the heterogeneous-cluster caveat, replacing the whole-document breadth note.
+- ADR-13 remains as the historical near-duplicate stress-test record; its "keep mean-pooled cosine" decision is superseded here.

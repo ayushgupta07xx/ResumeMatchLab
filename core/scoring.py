@@ -30,10 +30,27 @@ def _model():
 
 def embed_text(text: str) -> np.ndarray:
     """Embed one resume into a 384-dim L2-normalized vector."""
-    vec = _model().encode(
-        [text], normalize_embeddings=True, show_progress_bar=False
-    )[0]
+    vec = _model().encode([text], normalize_embeddings=True, show_progress_bar=False)[0]
     return np.asarray(vec, dtype=np.float32)
+
+
+def _resume_chunks(text: str) -> list[str]:
+    """Split a resume into bullet/line chunks for late-interaction scoring."""
+    lines = [ln.strip(" \t\u2022-\u2013*\u00b7").strip() for ln in text.splitlines()]
+    chunks = [ln for ln in lines if len(ln) >= 20]
+    return chunks or [text.strip() or " "]
+
+
+def embed_chunks(text: str) -> np.ndarray:
+    """Embed a resume into a (C, 384) matrix of L2-normalized chunk vectors.
+
+    Scoring takes each job's best-matching chunk (see ``score_against_jobs``), so a
+    specialist bullet lifts that resume in its own cluster instead of being averaged
+    away by whole-document mean pooling.
+    """
+    chunks = _resume_chunks(text)
+    vecs = _model().encode(chunks, normalize_embeddings=True, show_progress_bar=False)
+    return np.asarray(vecs, dtype=np.float32)
 
 
 def score_against_jobs(resume_vec: np.ndarray, jobs_matrix: np.ndarray) -> np.ndarray:
@@ -42,7 +59,12 @@ def score_against_jobs(resume_vec: np.ndarray, jobs_matrix: np.ndarray) -> np.nd
     Both sides are L2-normalized, so cosine similarity reduces to a dot product.
     Returns an (N,) array in roughly [-1, 1].
     """
-    return jobs_matrix @ resume_vec.astype(np.float32)
+    rv = resume_vec.astype(np.float32)
+    if rv.ndim == 1:
+        return jobs_matrix @ rv
+    # (C, 384) chunk matrix: each job scores against its best-matching resume
+    # chunk (asymmetric late interaction) — rewards depth over vocabulary breadth.
+    return (jobs_matrix @ rv.T).max(axis=1)
 
 
 def _as_text(resume: ResumeText | str) -> str:
@@ -54,7 +76,7 @@ def compare_resumes(
     resume_b: ResumeText | str,
     corpus: JobCorpus,
     *,
-    embed: Embedder = embed_text,
+    embed: Embedder = embed_chunks,
 ) -> ScoringResult:
     """Score resumes A and B against the corpus and return paired results.
 
