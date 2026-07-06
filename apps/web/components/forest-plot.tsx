@@ -5,6 +5,7 @@ import {
   BarChart,
   Cell,
   ErrorBar,
+  LabelList,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -32,6 +33,7 @@ function Card({ children, title, subtitle }: { children: React.ReactNode; title:
 export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
   const { t } = useTheme();
   const [selected, setSelected] = useState<ClusterRow | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
   const rows = [...clusters]
     .filter((c) => c.mean_delta !== null)
     .sort((a, b) => (a.mean_delta ?? 0) - (b.mean_delta ?? 0))
@@ -89,9 +91,40 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
               isAnimationActive={false}
               cursor="pointer"
               onClick={(d: any) => setSelected(d?.payload?.row ?? null)}
+              onMouseEnter={(_: any, i: number) => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
             >
+              <LabelList
+                dataKey="x"
+                content={(props: any) => {
+                  const { x, y, width, height, index, viewBox } = props;
+                  if (index !== hovered) return null;
+                  const label = "(click to see details)";
+                  const px = 6.2 * label.length; // approx text width at 10.5px mono
+                  const barEnd = x + width; // right end for +bars, left end for -bars
+                  const rightEdge = (viewBox?.x ?? 0) + (viewBox?.width ?? 9999);
+                  const leftEdge = viewBox?.x ?? 0;
+                  let tx: number;
+                  let anchor: "start" | "end";
+                  let inside = false;
+                  if (width >= 0) {
+                    if (barEnd + 8 + px <= rightEdge) { tx = barEnd + 8; anchor = "start"; }
+                    else { tx = barEnd - 8; anchor = "end"; inside = true; }
+                  } else {
+                    if (barEnd - 8 - px >= leftEdge) { tx = barEnd - 8; anchor = "end"; }
+                    else { tx = barEnd + 8; anchor = "start"; inside = true; }
+                  }
+                  const wide = Math.abs(width) > px + 20;
+                  return (
+                    <text x={tx} y={y + height / 2} dy={3} textAnchor={anchor}
+                      style={{ fontFamily: FF.mono, fontSize: 10.5, fill: inside ? t.text : t.muted, letterSpacing: "0.02em" }}>
+                      {label}
+                    </text>
+                  );
+                }}
+              />
               {rows.map((r, i) => (
-                <Cell key={i} fill={r.color} />
+                <Cell key={i} fill={r.color} fillOpacity={hovered === null || hovered === i ? 1 : 0.45} />
               ))}
               <ErrorBar dataKey="err" direction="x" width={4} strokeWidth={1.2} stroke={t.faint} />
             </Bar>
@@ -112,19 +145,51 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
 }
 
 function Chips({ items, color, t }: { items: { skill: string; freq: number }[]; color: string; t: any }) {
-  if (!items.length) return <span style={{ fontFamily: FF.mono, fontSize: 12, color: t.faint }}>none</span>;
+  if (!items.length)
+    return (
+      <span style={{ fontFamily: FF.mono, fontSize: 11.5, color: t.faint, letterSpacing: "0.04em" }}>
+        no distinguishing skills in this segment
+      </span>
+    );
+  const max = Math.max(...items.map((i) => i.freq), 0.01);
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-      {items.map((it) => (
-        <span
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {items.map((it, idx) => (
+        <div
           key={it.skill}
           style={{
-            fontFamily: FF.mono, fontSize: 12, color: t.text,
-            border: `1px solid ${color}`, borderRadius: 999, padding: "3px 10px",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            overflow: "hidden",
+            borderRadius: 8,
+            border: `1px solid ${color}${idx === 0 ? "" : "44"}`,
+            padding: "5px 11px",
+            background: "transparent",
           }}
         >
-          {it.skill} <span style={{ color: t.faint }}>{Math.round(it.freq * 100)}%</span>
-        </span>
+          {/* frequency bar — structure encodes the % */}
+          <span
+            style={{
+              position: "absolute", inset: 0, width: `${(it.freq / max) * 100}%`,
+              background: color, opacity: idx === 0 ? 0.16 : 0.09,
+            }}
+          />
+          <span
+            style={{
+              position: "relative", fontFamily: FF.mono,
+              fontSize: idx === 0 ? 13 : 12,
+              fontWeight: idx === 0 ? 700 : 400,
+              color: t.text, letterSpacing: "0.01em",
+            }}
+          >
+            {it.skill}
+          </span>
+          <span style={{ position: "relative", fontFamily: FF.mono, fontSize: 11, color: t.muted }}>
+            {Math.round(it.freq * 100)}%
+          </span>
+        </div>
       ))}
     </div>
   );
@@ -137,13 +202,17 @@ function DiffPanel({ row, onBack, t }: { row: ClusterRow; onBack: () => void; t:
       <style>{"@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}"}</style>
       <button
         onClick={onBack}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; e.currentTarget.style.color = t.bg; e.currentTarget.style.borderColor = "var(--accent)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.text; e.currentTarget.style.borderColor = "var(--accent)"; }}
         style={{
-          display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 16,
-          fontFamily: FF.mono, fontSize: 12, color: t.text, background: "transparent",
-          border: `1px solid ${t.border}`, borderRadius: 8, padding: "5px 11px", cursor: "pointer",
+          display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20,
+          fontFamily: FF.mono, fontSize: 11, fontWeight: 600, textTransform: "uppercase",
+          letterSpacing: "0.08em", color: t.text, background: "transparent",
+          border: `1px solid var(--accent)`, borderRadius: 999, padding: "7px 15px",
+          cursor: "pointer", transition: "all 160ms ease",
         }}
       >
-        {"\u2190"} back to all clusters
+        <span style={{ fontSize: 14, lineHeight: 1 }}>{"\u2190"}</span> back to all clusters
       </button>
       <p style={{ fontFamily: FF.display, fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 4px" }}>
         {row.label}
@@ -152,14 +221,23 @@ function DiffPanel({ row, onBack, t }: { row: ClusterRow; onBack: () => void; t:
         Skills common in this cluster&apos;s postings that appear in only one résumé — what separates
         A from B here. (The score itself is semantic similarity, so read these as differentiators, not exact causes.)
       </p>
-      <p style={{ fontFamily: FF.mono, fontSize: 11, color: A, margin: "0 0 6px", letterSpacing: "0.04em" }}>
-        {"\u25C0"} FAVORS RÉSUMÉ A
-      </p>
-      <Chips items={d.a_favoring} color={A} t={t} />
-      <p style={{ fontFamily: FF.mono, fontSize: 11, color: B, margin: "18px 0 6px", letterSpacing: "0.04em" }}>
-        FAVORS RÉSUMÉ B {"\u25B6"}
-      </p>
-      <Chips items={d.b_favoring} color={B} t={t} />
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}
+        className="max-[560px]:!grid-cols-1"
+      >
+        <div>
+          <p style={{ fontFamily: FF.mono, fontSize: 10.5, color: A, margin: "0 0 10px", letterSpacing: "0.08em" }}>
+            {"\u25C0"} FAVORS RÉSUMÉ A
+          </p>
+          <Chips items={d.a_favoring} color={A} t={t} />
+        </div>
+        <div>
+          <p style={{ fontFamily: FF.mono, fontSize: 10.5, color: B, margin: "0 0 10px", letterSpacing: "0.08em" }}>
+            FAVORS RÉSUMÉ B {"\u25B6"}
+          </p>
+          <Chips items={d.b_favoring} color={B} t={t} />
+        </div>
+      </div>
     </div>
   );
 }

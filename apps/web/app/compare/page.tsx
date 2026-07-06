@@ -73,7 +73,7 @@ export default function ComparePage() {
             opacity: loading ? 0.5 : 1,
           }}
         >
-          ▶ Try a demo (no upload)
+          Try a demo (no upload)
         </button>
       </div>
 

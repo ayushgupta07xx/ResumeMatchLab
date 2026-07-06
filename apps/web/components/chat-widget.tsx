@@ -150,7 +150,7 @@ export function ChatWidget() {
 
   useEffect(() => {
     setHint(true);
-    const id = setTimeout(() => setHint(false), 5000);
+    const id = setTimeout(() => setHint(false), 5000); // 5s dwell
     return () => clearTimeout(id);
   }, []);
 
@@ -236,7 +236,9 @@ export function ChatWidget() {
             boxShadow: "0 8px 24px -8px rgba(0,0,0,0.6)", whiteSpace: "nowrap",
           }}
         >
-          Questions? Ask the assistant
+          {pathname === "/results"
+            ? "Ask any detail about the result here \u2192"
+            : "Questions? Ask the assistant"}
         </div>
       )}
 
@@ -352,7 +354,7 @@ export function ChatWidget() {
                   }
                 }}
                 rows={1}
-                placeholder="Ask about ResumeMatch…"
+                placeholder={pathname === "/results" ? "Ask about the result…" : "Ask about ResumeMatch…"}
                 style={{
                   flex: 1, resize: "none", maxHeight: 96, fontFamily: FF.body, fontSize: 13.5,
                   color: t.text, background: "rgba(0,0,0,0.3)", border: `1px solid ${t.border}`,
