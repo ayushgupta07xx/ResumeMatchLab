@@ -43,7 +43,7 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
 
   return (
     <Card
-      title="Where each resume matches better — by job cluster"
+      title="Where each résumé matches better — by job cluster"
       subtitle="Average score gap per cluster (percentage points), with 95% bootstrap intervals."
     >
       <div style={{ height: 360, width: "100%", marginTop: 14 }}>
@@ -73,6 +73,8 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
                 color: t.text,
                 fontFamily: FF.mono,
               }}
+              labelStyle={{ color: t.text }}
+              itemStyle={{ color: t.text }}
               formatter={(v: any) => [`${v.toFixed(2)} pts`, "Δ (B − A)"]}
             />
             <Bar dataKey="x" radius={2} isAnimationActive={false}>
@@ -88,8 +90,8 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
         className="flex items-center justify-between"
         style={{ fontFamily: FF.mono, fontSize: 10, color: t.faint, marginTop: 6, letterSpacing: "0.04em" }}
       >
-        <span>{"\u25C0"} Resume A matches better</span>
-        <span>Resume B matches better {"\u25B6"}</span>
+        <span>{"\u25C0"} Résumé A matches better</span>
+        <span>Résumé B matches better {"\u25B6"}</span>
       </div>
     </Card>
   );

@@ -47,7 +47,7 @@ export function ExampleVerdict() {
       </div>
 
       <div style={{ fontFamily: FF.display, fontSize: 21, fontWeight: 600, marginTop: 18, color: t.muted }}>
-        Resume <span style={{ color: A, fontWeight: 700 }}>A</span> wins by
+        Résumé <span style={{ color: A, fontWeight: 700 }}>A</span> wins by
       </div>
       <div className="flex items-end" style={{ gap: 12, marginTop: 2 }}>
         <span style={{ fontFamily: FF.display, fontSize: 64, fontWeight: 800, lineHeight: 0.9, letterSpacing: "-0.03em" }}>
@@ -64,7 +64,7 @@ export function ExampleVerdict() {
       <div style={{ height: 1, background: t.border, margin: "24px 0 14px" }} />
 
       <div style={{ fontFamily: FF.body, fontSize: 12.5, color: t.muted, marginBottom: 4 }}>
-        A wins overall — here&apos;s where Resume B still edges ahead:
+        A wins overall — here&apos;s where Résumé B still edges ahead:
       </div>
 
       {B_WIN_LANES.map((l) => (

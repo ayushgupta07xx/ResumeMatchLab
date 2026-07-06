@@ -213,8 +213,37 @@ def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
             out[cid] = "Frontend / Backend / Full-stack"
             used.discard("Frontend / Mobile")
             used.discard("Backend Engineering")
-    for cid in titles_by_cluster:
-        out.setdefault(cid, "Mixed / General")
+    # Genuinely-mixed clusters (unnamed after greedy assignment): disambiguate by
+    # their most DISTINCTIVE title terms (freq in cluster / freq across the mixed
+    # set), so terms shared across mixed clusters (software, technical) don't win
+    # and two software-heavy clusters don't collide. Honest — it's what dominates,
+    # not a crisp segment the jobs don't support.
+    _GENERIC = {
+        "technical", "software", "engineering", "development", "product", "consultant",
+        "specialist", "senior", "lead", "manager", "engineer", "developer", "analyst",
+        "associate", "principal", "staff", "india", "services", "solutions", "systems",
+        "team", "new", "sr", "jr", "remote", "hybrid", "contract", "machine", "learning",
+    }
+    mixed = [cid for cid in titles_by_cluster if cid not in out]
+    tf: dict[int, dict[str, int]] = {}
+    doc_freq: dict[str, int] = {}
+    for cid in mixed:
+        counts: dict[str, int] = {}
+        for title in titles_by_cluster[cid]:
+            for tok in set(re.findall(r"[a-z+#]+", title.lower())):
+                if len(tok) > 2 and tok not in _GENERIC:
+                    counts[tok] = counts.get(tok, 0) + 1
+        tf[cid] = counts
+        for tok in counts:
+            doc_freq[tok] = doc_freq.get(tok, 0) + 1
+    for cid in mixed:
+        n = max(len(titles_by_cluster[cid]), 1)
+        scored = sorted(
+            ((cnt / n) / doc_freq.get(tok, 1), tok) for tok, cnt in tf[cid].items()
+        )
+        picks = [tok for _, tok in scored[-2:][::-1]]
+        labels = [w.upper() if len(w) <= 3 else w.title() for w in picks]
+        out[cid] = f"Mixed — {'/'.join(labels)}" if labels else "Mixed / General"
     return dict(sorted(out.items()))
 
 

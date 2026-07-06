@@ -60,7 +60,7 @@ export default function ResultsPage() {
         <div style={{ fontSize: 13, color: t.muted }}>
           {names ? (
             <>
-              Resumes in comparison:{" "}
+              Résumés in comparison:{" "}
               <span style={{ color: A, fontWeight: 700 }}>A</span>{" "}
               <span style={{ color: t.text }}>({names.a})</span>{" "}
               <span style={{ color: t.faint }}>vs</span>{" "}

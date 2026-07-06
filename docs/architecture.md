@@ -99,13 +99,13 @@ The corpus is partitioned by K-means into eight role families, which drive the p
 | # | Cluster |
 |---|---------|
 | 0 | DevOps / SRE / Cloud |
-| 1 | Mixed / General |
+| 1 | Mixed — Business/Advisory |
 | 2 | Data Engineering |
 | 3 | Machine Learning / AI |
 | 4 | Frontend / Backend / Full-stack |
-| 5 | Mixed / General |
-| 6 | Mixed / General |
-| 7 | Mixed / General |
+| 5 | Mixed — Administrator/Production |
+| 6 | Mixed — Automation/Java |
+| 7 | Mixed — Data/Backend |
 
 ---
 

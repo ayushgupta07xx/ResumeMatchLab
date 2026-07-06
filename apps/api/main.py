@@ -19,9 +19,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile  # noqa: E402
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
+from apps.api.chatbot import GroqError, groq_chat, prepare_messages
 from apps.api.serialize import report_to_dict  # noqa: E402
 from core.data import MODEL_NAME, load_corpus  # noqa: E402
 from core.scoring import compare_resumes  # noqa: E402
@@ -79,6 +81,34 @@ async def _resume_from(file: UploadFile | None, text: str | None, slot: str) -> 
     if text and text.strip():
         return parse_resume(raw_text=text)
     raise HTTPException(status_code=422, detail=f"Provide resume {slot} as a file or text.")
+
+
+class ChatBody(BaseModel):
+    messages: list[dict]
+    result: dict | None = None
+    page: str | None = None
+
+
+@app.post("/chat")
+async def chat(body: ChatBody) -> dict:
+    msgs = prepare_messages(body.messages)
+    if not msgs:
+        raise HTTPException(status_code=422, detail="Send at least one user message.")
+    try:
+        reply = await run_in_threadpool(groq_chat, msgs, body.result, body.page)
+    except GroqError as e:
+        reason = str(e)
+        if reason == "unconfigured":
+            raise HTTPException(
+                status_code=503,
+                detail="The assistant isn't configured on this deployment.",
+            ) from e
+        if reason == "rate_limited":
+            raise HTTPException(
+                status_code=429, detail="Assistant is busy — try again shortly."
+            ) from e
+        raise HTTPException(status_code=502, detail="Assistant is temporarily unavailable.") from e
+    return {"reply": reply}
 
 
 @app.get("/health")
