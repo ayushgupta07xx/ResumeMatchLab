@@ -219,10 +219,35 @@ def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
     # and two software-heavy clusters don't collide. Honest — it's what dominates,
     # not a crisp segment the jobs don't support.
     _GENERIC = {
-        "technical", "software", "engineering", "development", "product", "consultant",
-        "specialist", "senior", "lead", "manager", "engineer", "developer", "analyst",
-        "associate", "principal", "staff", "india", "services", "solutions", "systems",
-        "team", "new", "sr", "jr", "remote", "hybrid", "contract", "machine", "learning",
+        "technical",
+        "software",
+        "engineering",
+        "development",
+        "product",
+        "consultant",
+        "specialist",
+        "senior",
+        "lead",
+        "manager",
+        "engineer",
+        "developer",
+        "analyst",
+        "associate",
+        "principal",
+        "staff",
+        "india",
+        "services",
+        "solutions",
+        "systems",
+        "team",
+        "new",
+        "sr",
+        "jr",
+        "remote",
+        "hybrid",
+        "contract",
+        "machine",
+        "learning",
     }
     mixed = [cid for cid in titles_by_cluster if cid not in out]
     tf: dict[int, dict[str, int]] = {}
@@ -238,9 +263,7 @@ def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
             doc_freq[tok] = doc_freq.get(tok, 0) + 1
     for cid in mixed:
         n = max(len(titles_by_cluster[cid]), 1)
-        scored = sorted(
-            ((cnt / n) / doc_freq.get(tok, 1), tok) for tok, cnt in tf[cid].items()
-        )
+        scored = sorted(((cnt / n) / doc_freq.get(tok, 1), tok) for tok, cnt in tf[cid].items())
         picks = [tok for _, tok in scored[-2:][::-1]]
         labels = [w.upper() if len(w) <= 3 else w.title() for w in picks]
         out[cid] = f"Mixed — {'/'.join(labels)}" if labels else "Mixed / General"
