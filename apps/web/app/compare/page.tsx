@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { compareFiles } from "@/lib/api";
+import { compareFiles, compareText } from "@/lib/api";
+import { DEMO_A, DEMO_B, DEMO_NAMES } from "@/lib/demo";
 import { useResults, useTheme } from "@/lib/providers";
 import { ACC, A, B, FF } from "@/lib/theme";
 import { UploadZone } from "@/components/upload-zone";
@@ -17,6 +18,20 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const ready = !!a && !!b && !loading;
+
+  async function runDemo() {
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await compareText(DEMO_A, DEMO_B);
+      setNames(DEMO_NAMES);
+      setResult(data);
+      router.push("/results");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Demo failed. Try again.");
+      setLoading(false);
+    }
+  }
 
   async function run() {
     if (!a || !b) return;
@@ -42,6 +57,24 @@ export default function ComparePage() {
         <h1 style={{ fontFamily: FF.display, fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>
           Add both versions
         </h1>
+        <button
+          onClick={runDemo}
+          disabled={loading}
+          style={{
+            marginTop: 16,
+            fontFamily: FF.mono,
+            fontSize: 12.5,
+            color: t.text,
+            background: "transparent",
+            border: `1px solid var(--accent)`,
+            borderRadius: 999,
+            padding: "7px 16px",
+            cursor: loading ? "default" : "pointer",
+            opacity: loading ? 0.5 : 1,
+          }}
+        >
+          ▶ Try a demo (no upload)
+        </button>
       </div>
 
       <div
