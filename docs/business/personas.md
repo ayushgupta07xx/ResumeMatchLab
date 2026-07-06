@@ -26,7 +26,7 @@ Anjali wakes up, checks her placement-cell WhatsApp group, and sees three new op
 ### Goals
 - Land her **first full-time role** before campus placements end.
 - Know, objectively, which of her two resume drafts performs better — not just which one "looks nicer".
-- Understand which job clusters (Data & Analytics vs. Data Engineering vs. ML/AI) she is actually competitive for.
+- Understand which job clusters (Data Engineering vs. ML/AI vs. the broader mixed-role clusters) she is actually competitive for.
 
 ### Pain points
 - **No feedback loop.** Rejections are silent; she cannot tell a good resume from a bad one.
@@ -35,7 +35,7 @@ Anjali wakes up, checks her placement-cell WhatsApp group, and sees three new op
 
 ### How ResumeMatch helps Anjali
 - She uploads her old generic resume (A) and her new "data analyst" version (B). The verdict card tells her in plain language that **B wins by 8.4 points (p<0.001)** — she finally has a reason to commit to one draft.
-- The **per-cluster forest plot** shows she scores well against *Data & Analytics* but poorly against *Data Engineering*, so she stops wasting applications on the wrong cluster.
+- The **per-cluster forest plot** shows she scores well against *Data Engineering* but poorly against *DevOps / SRE / Cloud*, so she stops wasting applications on the wrong cluster.
 - It costs **₹0**, runs in the browser, and her resume is **never stored** — no credit card, no privacy worry.
 
 ---
@@ -60,7 +60,7 @@ Rohit works a full QA day, then studies analytics from 9 to 11 p.m. He has rebui
 
 ### Goals
 - **Prove repositioning works** — confirm the rewritten resume reads as "analytics", not "QA".
-- Quantify how far he has moved *toward* Data & Analytics and *away from* the Backend-engineering signal his testing past carries.
+- Quantify how far he has moved *toward* Data Engineering and *away from* the Frontend / Backend / Full-stack signal his testing past carries.
 - Avoid burning his limited recruiter goodwill on a resume that still signals the wrong role.
 
 ### Pain points
@@ -69,7 +69,7 @@ Rohit works a full QA day, then studies analytics from 9 to 11 p.m. He has rebui
 - **Trust.** He distrusts tools that give a vague "82/100" with no methodology.
 
 ### How ResumeMatch helps Rohit
-- The **per-cluster breakdown** is his killer feature: he can literally watch his score **rise on Data & Analytics and fall on Backend Engineering** between Variant A (old) and Variant B (rewritten). That is the repositioning proof he wanted.
+- The **per-cluster breakdown** is his killer feature: he can literally watch his score **rise on Data Engineering and fall on Frontend / Backend / Full-stack** between Variant A (old) and Variant B (rewritten). That is the repositioning proof he wanted.
 - The **statistical rigor** (paired test, bootstrap CI, Cohen's d, Bayesian posterior) earns his trust — he sees a confidence interval, not a mystery grade.
 - The downloadable **PDF report** gives him an artefact to reason about and revisit as he iterates draft C.
 
@@ -105,7 +105,7 @@ Sneha rarely job-hunts in volume. When she does move, it's deliberate — a hand
 
 ### How ResumeMatch helps Sneha
 - The A/B test answers her exact question — **metrics-forward vs. leadership-forward against live Product Management postings** — and the **bootstrap CI + power analysis** tell her whether the gap is statistically real or just sampling noise (the thing she most wants to avoid getting wrong).
-- The corpus is **role-aware**: she is scored against the Product Management cluster, not generic SDE keywords.
+- The corpus is **role-aware**: senior product/leadership postings sit in the broader mixed-role clusters, so she is scored against real market roles, not generic SDE keywords.
 - **In-memory only, never persisted** — privacy by default is a feature she actively checks for, and it removes her single biggest objection.
 
 ---
@@ -120,7 +120,7 @@ Sneha rarely job-hunts in volume. When she does move, it's deliberate — a hand
 | **Application volume** | Very high (spray) | Medium (targeted) | Very low (selective) |
 | **Tech / stats literacy** | Low | High | Very high |
 | **Willingness to pay** | ₹0 (student) | ₹200–500 one-time | Pays for real signal |
-| **Primary job clusters** | Data & Analytics, Data Eng | Data & Analytics vs. Backend Eng | Product Management |
+| **Primary job clusters** | Data Engineering, ML/AI | Data Engineering vs. Frontend/Backend | mixed-role clusters |
 | **Killer feature for them** | Plain-language verdict + free | Per-cluster repositioning proof | Statistical rigor + privacy |
 | **Biggest objection removed** | Cost | "Generic ATS is useless to me" | Privacy + senior-role grounding |
 

@@ -87,7 +87,7 @@ Twelve user stories for ResumeMatch Lab, written against the three personas defi
 **As** Career-Switcher Rohit, **I want** to see how each variant scores across the 8 job clusters, **so that** I can confirm my rewrite moves me toward analytics and away from QA.
 
 **Acceptance criteria**
-- **Given** the test has run, **when** I open the cluster view, **then** a forest plot shows the per-cluster A-vs-B difference with confidence intervals for all 8 clusters (Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, Design/UX).
+- **Given** the test has run, **when** I open the cluster view, **then** a forest plot shows the per-cluster A-vs-B difference with confidence intervals for all 8 clusters (four named role clusters — Data Engineering, ML/AI, DevOps/SRE/Cloud, Frontend/Backend/Full-stack — plus four broader mixed-role clusters).
 - **Given** I look at a specific cluster, **when** I read its row, **then** I can tell whether B beat A there and whether that cluster's difference is significant.
 
 **Points:** 5 · **Priority:** Must

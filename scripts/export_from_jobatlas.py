@@ -17,7 +17,6 @@ script only needs to be re-run to refresh the snapshot.
 from __future__ import annotations
 
 import re
-from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -163,23 +162,60 @@ def parse_embeddings(series: pd.Series) -> np.ndarray:
     return mat
 
 
-def label_clusters(titles_by_cluster: dict[int, str]) -> dict[int, str]:
+def _title_list(pooled_titles: str) -> list[str]:
+    # pooled string is space-joined lowered titles; split back on runs of ws
+    return [t for t in re.split(r"\s{2,}", pooled_titles.strip()) if t]
+
+
+def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
+    """Coverage-scored labeler: each cluster gets the rule matching the largest
+    share of its titles, assigned greedily by best (cluster, rule) coverage so a
+    name binds to the cluster it actually dominates. Word-boundary matching."""
+
+    rules = [
+        (name, [re.compile(rf"\b{re.escape(kw.strip())}", re.I) for kw in kws])
+        for name, kws in LABEL_RULES
+    ]
+    # coverage[cid][name] = fraction of that cluster's titles hitting the rule
+    cov: dict[int, dict[str, float]] = {}
+    for cid, pooled in titles_by_cluster.items():
+        titles = pooled or [""]
+        n = len(titles)
+        cov[cid] = {}
+        for name, pats in rules:
+            hits = sum(any(p.search(t) for p in pats) for t in titles)
+            cov[cid][name] = hits / n if n else 0.0
+
+    MIN_COV = 0.15  # below this, no rule really describes the cluster
+    pairs = sorted(
+        ((cov[cid][name], cid, name) for cid in cov for name, _ in rules),
+        reverse=True,
+    )
     out: dict[int, str] = {}
     used: set[str] = set()
-    for cid, titles in titles_by_cluster.items():
-        chosen: str | None = None
-        for name, kws in LABEL_RULES:
-            if name in used:
-                continue
-            if any(kw in titles for kw in kws):
-                chosen = name
-                break
-        if chosen is None:
-            toks = Counter(t for t in re.findall(r"[a-z]+", titles) if len(t) > 3 and t not in STOP)
-            chosen = (toks.most_common(1)[0][0].title() + " Roles") if toks else f"Cluster {cid}"
-        used.add(chosen)
-        out[cid] = chosen
-    return out
+    for frac, cid, name in pairs:
+        if cid in out or name in used or frac < MIN_COV:
+            continue
+        out[cid] = name
+        used.add(name)
+    # CODOMINANT_MERGE: if a cluster's top two rules are near-tied (<=0.12 apart)
+    # and are Frontend+Backend, name it for both rather than hiding one half.
+    MERGE_GAP = 0.12
+    for cid, scores in cov.items():
+        top = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)[:2]
+        (n1, s1), (n2, s2) = top[0], top[1]
+        names = {n1, n2}
+        if (
+            s1 - s2 <= MERGE_GAP
+            and s1 >= MIN_COV
+            and names == {"Frontend / Mobile", "Backend Engineering"}
+        ):
+            out[cid] = "Frontend / Backend / Full-stack"
+            used.discard("Frontend / Mobile")
+            used.discard("Backend Engineering")
+    for cid in titles_by_cluster:
+        out.setdefault(cid, "Mixed / General")
+    return dict(sorted(out.items()))
 
 
 def main() -> None:
@@ -208,11 +244,11 @@ def main() -> None:
     cluster_id = km.fit_predict(emb)
     df["cluster_id"] = cluster_id.astype("int16")
 
-    titles_by_cluster = {
-        cid: " ".join(df.loc[df.cluster_id == cid, "title"].fillna("").str.lower())
+    titles_list_by_cluster = {
+        cid: df.loc[df.cluster_id == cid, "title"].fillna("").str.lower().tolist()
         for cid in range(K)
     }
-    names = label_clusters(titles_by_cluster)
+    names = label_clusters(titles_list_by_cluster)
     df["cluster_label"] = df["cluster_id"].map(names).astype("string")
 
     JOBS_OUT.parent.mkdir(parents=True, exist_ok=True)

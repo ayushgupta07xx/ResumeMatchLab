@@ -9,7 +9,7 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 - **Genuinely differentiated value prop.** It is the only tool in its competitive set (Resume.io, Enhancv, Resume Worded, Teal) that runs a *real statistical A/B test against the live job market with a per-cluster breakdown*, rather than generic ATS keyword scoring.
 - **Statistical credibility as a moat.** Paired t-test/Wilcoxon, 10k-resample bootstrap CIs, Cohen's d, power analysis, CUPED variance reduction, mSPRT always-valid testing, a Bayesian posterior, and Bonferroni/BH-FDR correction across 8 clusters — this depth is rare in consumer resume tools and signals serious analyst skill.
 - **Market-grounded, not checklist-based.** Scores are computed against 9,014 actual Indian tech postings, so feedback reflects what the market is hiring for, not a one-size-fits-all template rubric.
-- **Per-cluster insight is uniquely actionable.** The forest plot across Data Engineering, Data & Analytics, ML/AI, DevOps/SRE/Cloud, Backend, Frontend/Mobile, Product Management, and Design/UX turns a vague "improve your resume" into "you moved toward analytics and away from QA."
+- **Per-cluster insight is uniquely actionable.** The forest plot across four named role clusters (Data Engineering, ML/AI, DevOps/SRE/Cloud, Frontend/Backend/Full-stack) plus four broader mixed-role clusters turns a vague "improve your resume" into "you moved toward Data Engineering and away from Frontend/Backend."
 - **Zero cost and zero friction.** Free on Streamlit Community Cloud (₹0/month to operate), no sign-up, no payment — perfectly matched to price-sensitive Indian freshers.
 - **Privacy by default.** Resumes are processed in-memory only and never persisted, which is a concrete trust advantage over tools that store user documents.
 
@@ -35,7 +35,7 @@ A candid strengths/weaknesses/opportunities/threats analysis of ResumeMatch Lab 
 - **Under-served switcher and senior segments.** Most resume tools are tuned for freshers and generic keywords; the per-cluster repositioning view (switchers) and senior-role grounding (seniors) address gaps competitors largely ignore.
 - **India-specific positioning.** Naukri's resume tools and Western products like Resume.io are not built around *statistically grounded, India-tech-cluster* feedback — a clear local wedge.
 - **B2B pivot to institutions.** Campus placement cells and corporate HR/L&D could license a cohort version (batch scoring, anonymized cluster analytics) — a far larger contract value than individual freemium.
-- **Corpus as a recurring asset.** Periodic refreshes and trend reporting ("Data & Analytics demand rose this quarter") create a content and SEO engine and a reason for users to return.
+- **Corpus as a recurring asset.** Periodic refreshes and trend reporting ("Data Engineering demand rose this quarter") create a content and SEO engine and a reason for users to return.
 - **Natural freemium ladder.** Free single A/B test → paid deeper drill-down, history, and unlimited reruns → institutional tier maps cleanly onto the three personas' willingness to pay.
 - **Methodology as thought-leadership content.** The rigor itself (CUPED, mSPRT, FDR) is publishable material that drives credibility and inbound interest.
 

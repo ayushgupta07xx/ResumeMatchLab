@@ -16,7 +16,7 @@ experiment against **9,014 live job postings**, with frequentist, Bayesian, and 
 inference.
 
 > **Verdict example:** *"Resume A wins by 2.01 points (95% CI [1.91, 2.12], p < 0.001).
-> But B wins **Machine Learning / AI** by +3.54 — send B for ML and DevOps roles, A for the rest."*
+> But B wins **Data Engineering** by +3.54 — send B for data-engineering and ML/AI roles, A for the rest."*
 
 ---
 

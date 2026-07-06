@@ -38,8 +38,8 @@ control across 8 job clusters — are explained and justified in the sections th
 Data-Science-flavored resume (B) over the corpus, A wins *overall* by **2.01 points**
 (bootstrap BCa 95% CI [1.91, 2.12], Wilcoxon p underflows to 0; mSPRT p ≈ 9.1e-303, Cohen's *d* = −0.41). But the global
 verdict is the least interesting output: the **per-cluster** breakdown shows B decisively
-wins **Machine Learning / AI (+3.54 pts)** and **DevOps / SRE / Cloud (+3.60 pts)** while A dominates
-Data Engineering, Backend, and the rest. The product's real recommendation is not
+wins **Data Engineering (+3.54 pts)** and **Machine Learning / AI (+3.60 pts)** while A dominates
+DevOps / SRE / Cloud, Frontend / Backend / Full-stack, and the broader mixed-role clusters. The product's real recommendation is not
 "send A" — it is *"send B for ML and DevOps/cloud roles, send A for the rest."* That
 conditional, defensible answer is what separates this from a single-number resume scorer.
 
@@ -189,8 +189,8 @@ measure match by cosine similarity. Four deliberate choices matter:
 does mean "more on-topic for this job." Two checks support it. First, by construction: a
 resume dense in a job's vocabulary lands nearer that job in the embedding space, which is
 exactly what semantic match should mean. Second, by behavior on the corpus: a data-flavored
-resume scores systematically higher against the Data & Analytics and ML/AI clusters than
-against Frontend, and the reverse holds for a frontend resume — the scores sort roles the
+resume scores systematically higher against the Data Engineering and ML/AI clusters than
+against DevOps / SRE / Cloud, and the reverse holds for an infrastructure resume — the scores sort roles the
 way a human reviewer would. Each resume is scored against a job by its best-matching chunk (asymmetric late
 interaction), so a specialist's strongest section drives the score instead of being
 averaged away; a much longer resume still offers more chunks and thus more chances at a
@@ -199,7 +199,7 @@ predictor — only a defensible, manipulable proxy for textual fit.
 
 **Why a bi-encoder, not a cross-encoder.** A cross-encoder (or an LLM judge) that reads each
 resume-job pair jointly would likely score relevance more accurately, but it would require
-one forward pass per pair — 4,000 model calls per comparison — making the product slow,
+one forward pass per pair — 18,028 model calls per comparison — making the product slow,
 costly, and non-deterministic. The bi-encoder embeds each document once and reduces scoring
 to a dot product, so a full 2-resume-by-9,014-job comparison is a single matrix multiply that
 runs in milliseconds on a free CPU host and returns the identical result every time. For a
@@ -211,9 +211,9 @@ last few points of absolute accuracy a cross-encoder would add.
 A single global verdict hides the most useful insight: a resume can win overall yet lose
 in the roles the candidate actually targets. This is a textbook **Simpson's-paradox** risk —
 an aggregate sign that reverses within subgroups. We therefore cluster the 9,014 job
-embeddings with **K-means (k=8)** and label clusters from their dominant titles: *Data
-Engineering, Data & Analytics, Machine Learning / AI, DevOps / SRE / Cloud, Backend
-Engineering, Frontend / Mobile, Product Management, Design / UX.* Clusters are computed
+embeddings with **K-means (k=8)** and label clusters from their dominant titles: *Data Engineering, Machine Learning /
+AI, DevOps / SRE / Cloud, Frontend / Backend / Full-stack, and four broader mixed-role
+clusters.* Clusters are computed
 once with a fixed seed and committed alongside the snapshot for reproducibility — the same
 labels ship with the data so the per-cluster analysis is identical for every user and every
 rerun.
@@ -606,10 +606,10 @@ normality, so the engine auto-selected the **Wilcoxon** test (p underflows to 0)
 −0.41, achieved power ≈ 1.00. CUPED cut variance by **43.8%** (effective N ×1.78), driven by
 between-cluster structure. mSPRT's always-valid p ≈ 9.1e-303 (reject). The Bayesian posterior
 put the per-job B-win rate at ≈ 0.286 with `P(p > 0.5) ≈ 0`. Crucially, the **per-cluster**
-view inverted the headline where it counts: **B won Machine Learning / AI (+3.54 pts)** and
-**DevOps / SRE / Cloud (+3.60 pts)**, while A dominated Data Engineering, Data & Analytics,
-Backend Engineering, Frontend / Mobile, Product Management, and Design / UX. The resulting recommendation — *"send B for
-ML and DevOps/cloud roles, send A for the rest"* — is the entire point of the product, and
+view inverted the headline where it counts: **B won Data Engineering (+3.54 pts)** and
+**Machine Learning / AI (+3.60 pts)**, while A dominated DevOps / SRE / Cloud, Frontend /
+Backend / Full-stack, and the broader mixed-role clusters. The resulting recommendation — *"send B for
+data-engineering and ML/AI roles, send A for the rest"* — is the entire point of the product, and
 it is one that no single global number could ever have produced.
 
 **What "tie" and "confidence" mean to the user.** A *tie* is not a failure of the test — it

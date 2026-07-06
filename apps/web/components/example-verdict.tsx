@@ -7,8 +7,8 @@ import { ACC, A, B, FF } from "@/lib/theme";
 // validated against a simulated cohort. The mini-forest shows only the two
 // clusters where the losing resume (B) still wins — real, canonical deltas.
 const B_WIN_LANES = [
-  { label: "Machine Learning / AI", delta: 3.54 },
-  { label: "DevOps / SRE / Cloud", delta: 3.60 },
+  { label: "Data Engineering", delta: 3.54 },
+  { label: "Machine Learning / AI", delta: 3.60 },
 ];
 const DOM = 5;
 
