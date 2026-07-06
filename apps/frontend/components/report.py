@@ -116,13 +116,25 @@ def build_pdf_report(report) -> bytes:
         Paragraph("Per-cluster breakdown (BH-FDR corrected)", styles["Heading3"]),
     ]
 
-    cluster_rows = [["Cluster", "n", "Δ (pts)", "p (BH)", "Winner"]]
+    cluster_rows = [["Cluster", "n", "Δ (pts)", "p (BH)", "Winner", "Missing skills"]]
+
+    def _gap_str(cid):
+        g = report.gaps.get(int(cid), []) if hasattr(report, "gaps") else []
+        return ", ".join(x["skill"] for x in g[:4]) if g else "—"
+
     for _, r in report.per_cluster.iterrows():
         md = "—" if pd.isna(r["mean_delta"]) else f"{r['mean_delta'] * 100:+.2f}"
         cluster_rows.append(
-            [str(r["label"]), str(int(r["n"])), md, _fmt_p(r["p_bh_fdr"]), str(r["winner"])]
+            [
+                str(r["label"]),
+                str(int(r["n"])),
+                md,
+                _fmt_p(r["p_bh_fdr"]),
+                str(r["winner"]),
+                _gap_str(r["cluster_id"]),
+            ]
         )
-    cluster = Table(cluster_rows, colWidths=[60 * mm, 16 * mm, 28 * mm, 28 * mm, 28 * mm])
+    cluster = Table(cluster_rows, colWidths=[46 * mm, 12 * mm, 22 * mm, 22 * mm, 20 * mm, 48 * mm])
     cluster.setStyle(_table_style())
     story += [
         cluster,

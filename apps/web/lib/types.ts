@@ -102,6 +102,7 @@ export interface ClusterRow {
   sig_bonferroni: boolean;
   sig_bh: boolean;
   winner: string;
+  gaps?: { skill: string; freq: number }[];
 }
 
 export interface InputMeta {

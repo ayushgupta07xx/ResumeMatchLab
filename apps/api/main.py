@@ -67,7 +67,7 @@ def _run(a: ResumeText, b: ResumeText) -> dict:
         )
     corpus = load_corpus()
     scoring = compare_resumes(a, b, corpus)
-    report = analyze(scoring, corpus)
+    report = analyze(scoring, corpus, a.text, b.text)
     return report_to_dict(report, scoring, a, b)
 
 

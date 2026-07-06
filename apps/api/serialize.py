@@ -41,6 +41,7 @@ def report_to_dict(report, scoring, resume_a=None, resume_b=None) -> dict:
                 "sig_bonferroni": bool(r["sig_bonferroni"]),
                 "sig_bh": bool(r["sig_bh"]),
                 "winner": str(r["winner"]),
+                "gaps": report.gaps.get(int(r["cluster_id"]), []),
             }
         )
 

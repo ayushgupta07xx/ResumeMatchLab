@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import type { ClusterRow } from "@/lib/types";
 import { useTheme } from "@/lib/providers";

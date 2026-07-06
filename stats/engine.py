@@ -56,6 +56,7 @@ class AnalysisReport:
     sequential: SequentialResult
     bayes: BayesResult
     per_cluster: pd.DataFrame
+    gaps: dict
     verdict: Verdict
     scores_summary: dict
 
@@ -105,7 +106,12 @@ def build_verdict(
     )
 
 
-def analyze(scoring: ScoringResult, corpus: JobCorpus) -> AnalysisReport:
+def analyze(
+    scoring: ScoringResult,
+    corpus: JobCorpus,
+    resume_a_text: str = "",
+    resume_b_text: str = "",
+) -> AnalysisReport:
     """Full pipeline on one A-vs-B scoring result."""
     deltas = scoring.deltas
     n = scoring.n_jobs
@@ -125,6 +131,9 @@ def analyze(scoring: ScoringResult, corpus: JobCorpus) -> AnalysisReport:
     sequential = msprt(deltas)
     bayes = beta_binomial(deltas)
     per_cluster = per_cluster_analysis(deltas, scoring.cluster_ids, corpus.cluster_names)
+    from core.gaps import cluster_gaps
+
+    gaps = cluster_gaps(corpus, per_cluster, resume_a_text, resume_b_text)
     verdict = build_verdict(deltas, primary, boot, bayes)
 
     scores_summary = {
@@ -149,6 +158,7 @@ def analyze(scoring: ScoringResult, corpus: JobCorpus) -> AnalysisReport:
         sequential=sequential,
         bayes=bayes,
         per_cluster=per_cluster,
+        gaps=gaps,
         verdict=verdict,
         scores_summary=scores_summary,
     )
