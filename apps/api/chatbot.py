@@ -124,11 +124,18 @@ def _result_context(result: dict | None) -> str:
     cu = result.get("cuped", {})
     ba = result.get("bayes", {})
     eff = result.get("effect", {})
-    clusters = [
-        f"{c.get('label')}: delta={c.get('mean_delta')}, winner={c.get('winner')}, "
-        f"p_bh={c.get('p_bh_fdr')}"
-        for c in result.get("clusters", [])
-    ]
+    clusters = []
+    for c in result.get("clusters", []):
+        diff = c.get("differentiators") or {}
+        af = ", ".join(s["skill"] for s in diff.get("a_favoring", [])[:4])
+        bf = ", ".join(s["skill"] for s in diff.get("b_favoring", [])[:4])
+        line = (
+            f"{c.get('label')}: delta={c.get('mean_delta')}, winner={c.get('winner')}, "
+            f"p_bh={c.get('p_bh_fdr')}"
+        )
+        if af or bf:
+            line += f"  [A-favoring skills: {af or 'none'}; B-favoring: {bf or 'none'}]"
+        clusters.append(line)
     lines = [
         "RESULT CONTEXT (the comparison currently on screen — cite these):",
         f"- verdict: {v.get('headline')}",

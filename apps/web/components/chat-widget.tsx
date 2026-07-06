@@ -22,9 +22,79 @@ const SUGGESTIONS = [
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 // Minimal inline markdown: **bold**, `code`, and paragraph breaks. No dependency.
+function inline(s: string, t: { text: string }, keyBase: string) {
+  const parts: React.ReactNode[] = [];
+  const re = /(\*\*([^*]+)\*\*|`([^`]+)`)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(s)) !== null) {
+    if (m.index > last) parts.push(s.slice(last, m.index));
+    if (m[2] !== undefined) {
+      parts.push(<strong key={`${keyBase}b${k++}`} style={{ fontWeight: 700, color: t.text }}>{m[2]}</strong>);
+    } else if (m[3] !== undefined) {
+      parts.push(<code key={`${keyBase}c${k++}`} style={{ fontFamily: FF.mono, fontSize: "0.85em", background: "rgba(255,255,255,0.08)", borderRadius: 4, padding: "1px 4px" }}>{m[3]}</code>);
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) parts.push(s.slice(last));
+  return parts;
+}
+
+function isTableBlock(block: string): boolean {
+  const lines = block.split("\n").filter((l) => l.trim());
+  return (
+    lines.length >= 2 &&
+    lines[0].includes("|") &&
+    /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[1]) &&
+    lines[1].includes("-")
+  );
+}
+
+function splitRow(line: string): string[] {
+  return line.replace(/^\s*\|/, "").replace(/\|\s*$/, "").split("|").map((c) => c.trim());
+}
+
 function renderRich(text: string, t: { text: string }) {
   const blocks = text.split(/\n{2,}/);
   return blocks.map((block, bi) => {
+    if (isTableBlock(block)) {
+      const lines = block.split("\n").filter((l) => l.trim());
+      const head = splitRow(lines[0]);
+      const body = lines.slice(2).map(splitRow);
+      return (
+        <div key={bi} style={{ overflowX: "auto", margin: bi === 0 ? 0 : "8px 0 0" }}>
+          <table style={{ borderCollapse: "collapse", fontSize: 12.5, width: "100%" }}>
+            <thead>
+              <tr>
+                {head.map((h, hi) => (
+                  <th key={hi} style={{ textAlign: "left", padding: "4px 8px", borderBottom: `1px solid ${t.text}33`, fontWeight: 700, color: t.text, whiteSpace: "nowrap" }}>
+                    {inline(h, t, `h${bi}-${hi}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {body.map((r, ri) => (
+                <tr key={ri}>
+                  {r.map((cell, ci) => (
+                    <td key={ci} style={{ padding: "4px 8px", borderBottom: "1px solid rgba(255,255,255,0.06)", verticalAlign: "top" }}>
+                      {inline(cell, t, `r${bi}-${ri}-${ci}`)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    return renderBlock(block, bi, t);
+  });
+}
+
+function renderBlock(block: string, bi: number, t: { text: string }) {
+  {
     const parts: React.ReactNode[] = [];
     const re = /(\*\*([^*]+)\*\*|`([^`]+)`)/g;
     let last = 0;
@@ -62,7 +132,7 @@ function renderRich(text: string, t: { text: string }) {
         {parts}
       </p>
     );
-  });
+  }
 }
 
 export function ChatWidget() {
