@@ -57,6 +57,7 @@ class AnalysisReport:
     bayes: BayesResult
     per_cluster: pd.DataFrame
     gaps: dict
+    differentiators: dict
     verdict: Verdict
     scores_summary: dict
 
@@ -131,9 +132,10 @@ def analyze(
     sequential = msprt(deltas)
     bayes = beta_binomial(deltas)
     per_cluster = per_cluster_analysis(deltas, scoring.cluster_ids, corpus.cluster_names)
-    from core.gaps import cluster_gaps
+    from core.gaps import cluster_differentiators, cluster_gaps
 
     gaps = cluster_gaps(corpus, per_cluster, resume_a_text, resume_b_text)
+    differentiators = cluster_differentiators(corpus, per_cluster, resume_a_text, resume_b_text)
     verdict = build_verdict(deltas, primary, boot, bayes)
 
     scores_summary = {
@@ -159,6 +161,7 @@ def analyze(
         bayes=bayes,
         per_cluster=per_cluster,
         gaps=gaps,
+        differentiators=differentiators,
         verdict=verdict,
         scores_summary=scores_summary,
     )

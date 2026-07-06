@@ -49,6 +49,34 @@ def _cluster_skill_freq(cluster_id: int, corpus_key: int) -> tuple[tuple[str, fl
     return tuple(freqs)
 
 
+def cluster_differentiators(
+    corpus, per_cluster, resume_a_text: str, resume_b_text: str
+) -> dict[int, dict]:
+    """{cluster_id: {a_favoring:[{skill,freq}], b_favoring:[{skill,freq}]}} — skills
+    one resume has and the other lacks, common in THIS cluster's postings. Descriptive:
+    these separate A from B for this segment; the score is embedding cosine, so this
+    explains *what differs*, not a causal keyword weight."""
+    _CORPUS_REF[id(corpus)] = corpus
+    skills_a = _skills_in(resume_a_text)
+    skills_b = _skills_in(resume_b_text)
+    out: dict[int, dict] = {}
+    for _, row in per_cluster.iterrows():
+        cid = int(row["cluster_id"])
+        freq = dict(_cluster_skill_freq(cid, id(corpus)))
+        a_only = sorted(
+            ({"skill": s, "freq": round(freq[s], 3)} for s in (skills_a - skills_b) if s in freq),
+            key=lambda d: d["freq"],
+            reverse=True,
+        )[:TOP_N]
+        b_only = sorted(
+            ({"skill": s, "freq": round(freq[s], 3)} for s in (skills_b - skills_a) if s in freq),
+            key=lambda d: d["freq"],
+            reverse=True,
+        )[:TOP_N]
+        out[cid] = {"a_favoring": a_only, "b_favoring": b_only}
+    return out
+
+
 def cluster_gaps(
     corpus, per_cluster, resume_a_text: str, resume_b_text: str
 ) -> dict[int, list[dict]]:

@@ -103,6 +103,10 @@ export interface ClusterRow {
   sig_bh: boolean;
   winner: string;
   gaps?: { skill: string; freq: number }[];
+  differentiators?: {
+    a_favoring: { skill: string; freq: number }[];
+    b_favoring: { skill: string; freq: number }[];
+  };
 }
 
 export interface InputMeta {
