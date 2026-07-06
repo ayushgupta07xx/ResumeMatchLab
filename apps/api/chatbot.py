@@ -17,7 +17,7 @@ import os
 import requests
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-DEFAULT_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_MODEL = "openai/gpt-oss-120b"
 MAX_USER_CHARS = 1500
 MAX_TURNS = 12
 TIMEOUT_S = 30
