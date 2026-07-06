@@ -2,16 +2,40 @@
 
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/lib/providers";
 import { ACC, FF } from "@/lib/theme";
 
 function Tex({ tex }: { tex: string }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const html = katex.renderToString(tex, { displayMode: true, throwOnError: false });
+  useEffect(() => {
+    const fit = () => {
+      const wrap = wrapRef.current;
+      const inner = innerRef.current;
+      if (!wrap || !inner) return;
+      const formula = inner.querySelector<HTMLElement>(".katex");
+      const natural = formula ? formula.offsetWidth : inner.scrollWidth;
+      const avail = wrap.clientWidth;
+      setScale(natural > avail && natural > 0 ? Math.max(avail / natural, 0.5) : 1);
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [html]);
   return (
     <div
-      style={{ overflowX: "auto", margin: "12px 0 2px" }}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+      ref={wrapRef}
+      style={{ display: "flex", justifyContent: "center", overflow: "hidden", margin: "12px 0 2px" }}
+    >
+      <div
+        ref={innerRef}
+        style={{ transform: `scale(${scale})`, transformOrigin: "center center", display: "inline-block" }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
   );
 }
 
@@ -21,8 +45,8 @@ const STEPS: Step[] = [
   {
     n: "01",
     title: "Semantic scoring",
-    q: "How well does each resume match each job?",
-    body: "Both resumes and all 9,014 job descriptions are embedded with a sentence-transformer (BGE-small, 384 dimensions). Cosine similarity scores each resume against every job, and subtracting gives one paired difference per job.",
+    q: "How well does each résumé match each job?",
+    body: "Both résumés and all 9,014 job descriptions are embedded with a sentence-transformer (BGE-small, 384 dimensions). Cosine similarity scores each résumé against every job, and subtracting gives one paired difference per job.",
     tex: [
       String.raw`\operatorname{score}(r,j)=\cos(\mathbf{e}_r,\mathbf{e}_j)=\dfrac{\mathbf{e}_r\cdot\mathbf{e}_j}{\lVert\mathbf{e}_r\rVert\,\lVert\mathbf{e}_j\rVert}`,
       String.raw`d_i=\operatorname{score}_B(i)-\operatorname{score}_A(i)`,
@@ -60,7 +84,7 @@ const STEPS: Step[] = [
     n: "06",
     title: "CUPED variance reduction",
     q: "Can we sharpen the estimate?",
-    body: "CUPED residualizes the deltas on pre-experiment covariates (job cluster, description length), stripping out variance unrelated to the resumes and nearly doubling the effective sample size.",
+    body: "CUPED residualizes the deltas on pre-experiment covariates (job cluster, description length), stripping out variance unrelated to the résumés and nearly doubling the effective sample size.",
     tex: [
       String.raw`d_i^{\text{adj}}=d_i-\mathbf{X}_i^{\top}\hat{\boldsymbol\beta}+\bar d`,
       String.raw`\text{var. reduction}=1-\dfrac{\operatorname{var}(d^{\text{adj}})}{\operatorname{var}(d)}=R^2,\qquad N_{\text{eff}}=\dfrac{N}{1-R^2}`,
@@ -83,7 +107,7 @@ const STEPS: Step[] = [
   {
     n: "09",
     title: "Per-cluster breakdown with FDR control",
-    q: "Where does each resume pull ahead?",
+    q: "Where does each résumé pull ahead?",
     body: "The same test runs inside each of the 8 job clusters. Bonferroni and Benjamini\u2013Hochberg corrections keep significance honest across 8 simultaneous comparisons.",
     tex: [String.raw`\text{Bonferroni: }\alpha_{\text{adj}}=\tfrac{\alpha}{m},\qquad \text{BH: reject if }p_{(k)}\le\tfrac{k}{m}\,\alpha\quad(m=8)`],
   },
@@ -92,7 +116,7 @@ const STEPS: Step[] = [
 export default function HowItWorks() {
   const { t } = useTheme();
   return (
-    <main style={{ maxWidth: 760, margin: "0 auto", padding: "56px 28px 96px" }}>
+    <main style={{ maxWidth: 960, margin: "0 auto", padding: "56px 28px 96px" }}>
       <div style={{ fontFamily: FF.mono, fontSize: 11, letterSpacing: "0.16em", color: t.accentText, marginBottom: 18 }}>
         HOW IT WORKS
       </div>
@@ -104,9 +128,18 @@ export default function HowItWorks() {
         to call a real A/B test. Here&apos;s each stage, the question it answers, and the math.
       </p>
 
-      <div style={{ marginTop: 36, display: "grid", borderRadius: 16, overflow: "hidden", border: `1px solid var(--accent)`, background: "transparent" }}>
+           <div style={{ marginTop: 36, display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 16 }}>
         {STEPS.map((s, i) => (
-          <div key={s.n} style={{ background: "transparent", padding: "24px 26px", borderTop: i === 0 ? "none" : `1px solid var(--accent-soft)` }}>
+          <div
+            key={s.n}
+            style={{
+              background: "transparent",
+              border: `1px solid var(--accent)`,
+              borderRadius: 14,
+              padding: "22px 24px",
+              gridColumn: i === STEPS.length - 1 && STEPS.length % 2 === 1 ? "1 / -1" : "auto",
+            }}
+          >
             <div className="flex items-baseline" style={{ gap: 14 }}>
               <span style={{ fontFamily: FF.mono, fontSize: 13, color: ACC, fontWeight: 500 }}>{s.n}</span>
               <div style={{ minWidth: 0, flex: 1 }}>
@@ -129,8 +162,8 @@ export default function HowItWorks() {
       <div
         style={{
           marginTop: 28,
-          background: t.surface,
-          border: `1px solid ${t.border}`,
+          background: "transparent",
+          border: `1px solid var(--accent)`,
           borderRadius: 14,
           padding: "20px 22px",
         }}
@@ -154,7 +187,7 @@ export default function HowItWorks() {
 
       <p style={{ fontSize: 13.5, color: t.faint, lineHeight: 1.6, marginTop: 28 }}>
         Pre-launch figures shown across the app are validated against a simulated cohort. Your
-        resumes are read in memory to compute the scores and never stored.
+        résumés are read in memory to compute the scores and never stored.
       </p>
     </main>
   );

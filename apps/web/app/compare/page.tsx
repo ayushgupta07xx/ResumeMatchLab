@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { compareFiles } from "@/lib/api";
 import { useResults, useTheme } from "@/lib/providers";
-import { ACC, ACC_PRESS, A, B, FF } from "@/lib/theme";
+import { ACC, A, B, FF } from "@/lib/theme";
 import { UploadZone } from "@/components/upload-zone";
 
 export default function ComparePage() {
@@ -85,7 +85,7 @@ export default function ComparePage() {
             borderRadius: 12,
             fontFamily: FF.display,
             border: ready ? "none" : "1px solid var(--accent)",
-            boxShadow: ready ? `0 2px 0 ${ACC_PRESS}, 0 10px 30px ${ACC}3d` : "none",
+            boxShadow: ready ? "0 8px 24px var(--accent-soft)" : "none",
             opacity: loading ? 0.85 : 1,
             transition: "transform .12s, box-shadow .2s, opacity .2s",
           }}

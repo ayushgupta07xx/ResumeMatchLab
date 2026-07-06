@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FileText, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/lib/providers";
-import { ACC, FF } from "@/lib/theme";
+import { FF } from "@/lib/theme";
 
 export function Nav() {
   const { mode, t, toggle } = useTheme();
@@ -45,10 +45,9 @@ export function Nav() {
               placeItems: "center",
               width: 34,
               height: 34,
-              borderRadius: 8,
-              border: `1px solid var(--accent)`,
+              border: "none",
               background: "transparent",
-              color: t.muted,
+              color: t.text,
               cursor: "pointer",
             }}
           >
@@ -58,12 +57,15 @@ export function Nav() {
             href="/about"
             style={{
               fontFamily: FF.body,
-              fontSize: 14,
+              fontSize: 13.5,
               fontWeight: 600,
               color: onAbout ? t.text : t.muted,
               textDecoration: "none",
-              paddingBottom: 4,
-              borderBottom: onAbout ? `2px solid ${ACC}` : "2px solid transparent",
+              padding: "7px 15px",
+              borderRadius: 9,
+              border: `1px solid ${onAbout ? "var(--accent)" : "var(--accent-soft)"}`,
+              background: onAbout ? "var(--accent-tint)" : "transparent",
+              transition: "color .15s ease, border-color .15s ease, background .15s ease",
             }}
           >
             About

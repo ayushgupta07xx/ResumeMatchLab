@@ -55,14 +55,14 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
             No decisive winner
           </div>
           <p style={{ color: t.muted, marginTop: 10, maxWidth: 520, lineHeight: 1.6 }}>
-            Across {summary.n_jobs.toLocaleString()} jobs the two resumes score within noise of each
+            Across {summary.n_jobs.toLocaleString()} jobs the two résumés score within noise of each
             other — the confidence interval includes zero.
           </p>
         </>
       ) : (
         <>
           <div style={{ fontFamily: FF.display, fontSize: 24, fontWeight: 600, marginTop: 16, color: t.muted, letterSpacing: "-0.01em" }}>
-            Resume <span style={{ color: winColor, fontWeight: 700 }}>{winner}</span> is the stronger match
+            Résumé <span style={{ color: winColor, fontWeight: 700 }}>{winner}</span> is the stronger match
           </div>
           <div className="flex items-end" style={{ gap: 28, marginTop: 14, flexWrap: "wrap" }}>
             <div>
@@ -72,7 +72,7 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
                 </span>
               </div>
               <div style={{ fontSize: 13, color: t.muted, marginTop: 8 }}>
-                of {summary.n_jobs.toLocaleString()} jobs it out-scores Resume {winner === "A" ? "B" : "A"}
+                of {summary.n_jobs.toLocaleString()} jobs it out-scores Résumé {winner === "A" ? "B" : "A"}
               </div>
             </div>
             <div style={{ paddingBottom: 4 }}>

@@ -15,7 +15,7 @@ export function ScoreDistribution({ dist }: { dist: Distributions }) {
         Match-score distributions
       </h3>
       <p style={{ fontSize: 13, color: t.muted, margin: "6px 0 0" }}>
-        How each resume&apos;s similarity scores spread across the corpus.
+        How each résumé&apos;s similarity scores spread across the corpus.
       </p>
       <div style={{ height: 250, width: "100%", marginTop: 14 }}>
         <ResponsiveContainer>
@@ -50,17 +50,17 @@ export function ScoreDistribution({ dist }: { dist: Distributions }) {
               }}
               labelFormatter={(v: any) => `score ≈ ${v.toFixed(3)}`}
             />
-            <Area type="monotone" dataKey="a" name="Resume A" stroke={A} fill="url(#fillA)" strokeWidth={1.5} isAnimationActive={false} />
-            <Area type="monotone" dataKey="b" name="Resume B" stroke={B} fill="url(#fillB)" strokeWidth={1.5} isAnimationActive={false} />
+            <Area type="monotone" dataKey="a" name="Résumé A" stroke={A} fill="url(#fillA)" strokeWidth={1.5} isAnimationActive={false} />
+            <Area type="monotone" dataKey="b" name="Résumé B" stroke={B} fill="url(#fillB)" strokeWidth={1.5} isAnimationActive={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
       <div className="flex items-center justify-center" style={{ gap: 24, fontSize: 12, color: t.muted, marginTop: 4 }}>
         <span className="flex items-center" style={{ gap: 6 }}>
-          <span style={{ width: 10, height: 10, borderRadius: 99, background: A, display: "inline-block" }} /> Resume A
+          <span style={{ width: 10, height: 10, borderRadius: 99, background: A, display: "inline-block" }} /> Résumé A
         </span>
         <span className="flex items-center" style={{ gap: 6 }}>
-          <span style={{ width: 10, height: 10, borderRadius: 99, background: B, display: "inline-block" }} /> Resume B
+          <span style={{ width: 10, height: 10, borderRadius: 99, background: B, display: "inline-block" }} /> Résumé B
         </span>
       </div>
     </div>

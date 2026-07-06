@@ -32,7 +32,7 @@ function Head({ side, color, t }: { side: "A" | "B"; color: string; t: ThemeToke
       >
         {side}
       </span>
-      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.muted }}>Resume {side}</span>
+      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.muted }}>Résumé {side}</span>
     </div>
   );
 }
@@ -187,7 +187,7 @@ export function UploadZone({
             autoFocus
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Paste your resume text…"
+            placeholder="Paste your résumé text…"
             style={{
               width: "100%",
               height: 128,
