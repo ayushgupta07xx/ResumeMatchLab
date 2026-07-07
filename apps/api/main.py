@@ -26,6 +26,8 @@ from pydantic import BaseModel  # noqa: E402
 from apps.api.chatbot import GroqError, groq_chat, prepare_messages
 from apps.api.serialize import report_to_dict  # noqa: E402
 from core.data import MODEL_NAME, load_corpus  # noqa: E402
+from core.fit import fit_resume
+from core.fit_serialize import fit_to_dict
 from core.scoring import compare_resumes  # noqa: E402
 from core.types import MIN_SCORABLE_CHARS, ResumeText  # noqa: E402
 from parsers.resume import parse_resume  # noqa: E402
@@ -58,6 +60,10 @@ app.add_middleware(
 class TextPair(BaseModel):
     resume_a: str
     resume_b: str
+
+
+class FitText(BaseModel):
+    resume: str
 
 
 def _run(a: ResumeText, b: ResumeText) -> dict:
@@ -138,3 +144,26 @@ async def compare(
 @app.post("/compare/text")
 def compare_text(body: TextPair) -> dict:
     return _run(parse_resume(raw_text=body.resume_a), parse_resume(raw_text=body.resume_b))
+
+
+def _run_fit(r: ResumeText) -> dict:
+    if not r.is_scorable:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Resume parsed to under {MIN_SCORABLE_CHARS} characters; cannot score.",
+        )
+    corpus = load_corpus()
+    return fit_to_dict(fit_resume(r.text, corpus))
+
+
+@app.post("/fit")
+async def fit(
+    resume: UploadFile | None = File(default=None), resume_text: str | None = Form(default=None)
+) -> dict:
+    r = await _resume_from(resume, resume_text, "")
+    return _run_fit(r)
+
+
+@app.post("/fit/text")
+def fit_text(body: FitText) -> dict:
+    return _run_fit(parse_resume(raw_text=body.resume))
