@@ -137,7 +137,7 @@ function renderBlock(block: string, bi: number, t: { text: string }) {
 
 export function ChatWidget() {
   const { t } = useTheme();
-  const { result } = useResults();
+  const { result, fitResult } = useResults();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState(false);
@@ -204,7 +204,7 @@ export function ChatWidget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: next.filter((m) => m.role === "user" || m.role === "assistant"),
-          result: result ?? null,
+          result: fitResult ?? result ?? null,
           page: pathname,
         }),
       });

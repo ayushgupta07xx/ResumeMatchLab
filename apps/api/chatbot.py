@@ -119,10 +119,44 @@ def prepare_messages(raw: list[dict]) -> list[dict]:
     return out
 
 
+def _fit_context(result: dict) -> str:
+    """Grounding block for a single-résumé fit (no A/B verdict): per-cluster
+    role_fit percentile, matched/missing skills, and coverage."""
+    ov = result.get("overall", {})
+    rows = sorted(
+        result.get("clusters", []),
+        key=lambda c: c.get("role_fit", 0),
+        reverse=True,
+    )
+    lines = [
+        "FIT CONTEXT (single résumé scored against the job market — cite these):",
+        f"- overall: mean_score={ov.get('mean_score')}, best_score={ov.get('best_score')}, "
+        f"n_jobs={ov.get('n_jobs')}",
+        "- role_fit is a within-role percentile (0-100): the résumé's match to that "
+        "cluster ranked against every corpus job's match to it. NOT a hireability score.",
+        "- per-cluster (strongest first):",
+    ]
+    for c in rows:
+        matched = ", ".join(sk["skill"] for sk in (c.get("matched_skills") or [])[:6])
+        missing = ", ".join(sk["skill"] for sk in (c.get("missing_skills") or [])[:6])
+        cov = c.get("coverage", {})
+        secs = cov.get("sections", {})
+        present = ", ".join(k for k, v in secs.items() if v) or "none"
+        lines.append(
+            f"  {c.get('label')}: role_fit={c.get('role_fit')}, "
+            f"skills_ratio={cov.get('skills_ratio')}, quantified={cov.get('quantified')}, "
+            f"sections=[{present}]"
+        )
+        lines.append(f"      matched: {matched or 'none'}; missing: {missing or 'none'}")
+    return "\n".join(lines)
+
+
 def _result_context(result: dict | None) -> str:
     """Compact the result JSON into a grounding block the model can cite."""
     if not result:
         return "No comparison has been run yet; explain concepts generally."
+    if result.get("mode") == "single_fit":
+        return _fit_context(result)
     v = result.get("verdict", {})
     cu = result.get("cuped", {})
     ba = result.get("bayes", {})
