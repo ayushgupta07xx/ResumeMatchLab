@@ -21,7 +21,7 @@ def test_health():
     body = r.json()
     assert body["status"] == "ok"
     assert body["n_jobs"] == 9014
-    assert body["n_clusters"] == 8
+    assert body["n_clusters"] == 9
     assert body["model"].startswith("BAAI/")
 
 
@@ -52,7 +52,7 @@ def test_serializer_contract():
         assert key in payload
 
     assert payload["verdict"]["winner"] in {"A", "B", "tie"}
-    assert len(payload["clusters"]) == 8
+    assert len(payload["clusters"]) == 9
     assert len(payload["bayes"]["posterior_curve"]) == 128
     assert len(payload["distributions"]["bin_centers"]) == 40
     assert payload["summary"]["n_jobs"] == 9014

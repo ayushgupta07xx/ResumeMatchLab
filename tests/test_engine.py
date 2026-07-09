@@ -17,7 +17,7 @@ def test_corpus_loads():
     assert c.matrix.shape == (9014, 384)
     norms = np.linalg.norm(c.matrix, axis=1)
     assert np.allclose(norms, 1.0, atol=1e-4)
-    assert c.n_clusters == 8
+    assert c.n_clusters == 9
 
 
 def test_score_against_jobs_range():
@@ -44,7 +44,7 @@ def test_end_to_end_analyze():
     rep = analyze(scoring, c)
     assert rep.n_jobs == 9014
     assert rep.verdict.winner in {"A", "B", "tie"}
-    assert len(rep.per_cluster) == 8
+    assert len(rep.per_cluster) == c.n_clusters
     assert 0.0 <= rep.cuped.variance_reduction <= 1.0
     assert 0.0 <= rep.bayes.prob_b_beats_a <= 1.0
     assert rep.mde.shape[0] == 3
