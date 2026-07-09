@@ -3,7 +3,6 @@ import { Btn } from "@/components/btn";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useResults, useTheme } from "@/lib/providers";
 import { A, B, FF } from "@/lib/theme";
 import { fmtP, fmtPct, fmtPts } from "@/lib/format";

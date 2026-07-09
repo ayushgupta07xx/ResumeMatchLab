@@ -108,7 +108,7 @@ export function FitBars({
               }}
               labelStyle={{ color: t.text }}
               itemStyle={{ color: t.text }}
-              formatter={(_v: any, _n: any, item: { payload?: (typeof rows)[number] }) => {
+              formatter={(_v, _n, item: { payload?: (typeof rows)[number] }) => {
                 const p = item?.payload;
                 if (!p) return ["", ""];
                 return [`${p.pct.toFixed(1)} pct · role fit ${p.row.role_fit} · click to open`, "Fit"];
@@ -119,7 +119,7 @@ export function FitBars({
               radius={2}
               isAnimationActive={false}
               cursor={onSelect ? "pointer" : undefined}
-              onClick={(d: any) => onSelect?.(d?.payload?.row)}
+              onClick={(d: { payload?: (typeof rows)[number] }) => { const r = d?.payload?.row; if (r) onSelect?.(r); }}
             >
               {rows.map((r, i) => (
                 <Cell key={i} fill={r.color} />
@@ -127,7 +127,7 @@ export function FitBars({
               <LabelList
                 dataKey="pct"
                 position="right"
-                formatter={(v: any) => `${Number(v).toFixed(0)}`}
+                formatter={(v) => `${Number(v).toFixed(0)}`}
                 style={{ fontFamily: FF.mono, fontSize: 11, fill: t.muted }}
               />
             </Bar>

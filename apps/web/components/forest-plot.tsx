@@ -13,10 +13,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type { LabelProps } from "recharts";
 import type { ClusterRow } from "@/lib/types";
 import { useTheme } from "@/lib/providers";
 import { useState } from "react";
-import { A, B, FF } from "@/lib/theme";
+import { A, B, FF, type ThemeTokens } from "@/lib/theme";
 
 function Card({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle: string }) {
   const { t } = useTheme();
@@ -61,7 +62,7 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
             <XAxis
               type="number"
               tick={{ fontSize: 11, fill: t.muted, fontFamily: FF.mono }}
-              tickFormatter={(v: any) => v.toFixed(0)}
+              tickFormatter={(v) => Number(v).toFixed(0)}
               stroke={t.border}
             />
             <YAxis
@@ -84,21 +85,26 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
               }}
               labelStyle={{ color: t.text }}
               itemStyle={{ color: t.text }}
-              formatter={(v: any) => [`${v.toFixed(2)} pts`, "Δ (B − A)"]}
+              formatter={(v) => [`${Number(v).toFixed(2)} pts`, "Δ (B − A)"]}
             />
             <Bar
               dataKey="x"
               radius={2}
               isAnimationActive={false}
               cursor="pointer"
-              onClick={(d: any) => setSelected(d?.payload?.row ?? null)}
-              onMouseEnter={(_: any, i: number) => setHovered(i)}
+              onClick={(d: { payload?: { row?: ClusterRow } }) => setSelected(d?.payload?.row ?? null)}
+              onMouseEnter={(_: unknown, i: number) => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
             >
               <LabelList
                 dataKey="x"
-                content={(props: any) => {
-                  const { x, y, width, height, index, viewBox } = props;
+                content={(props: LabelProps) => {
+                  const x = Number(props.x ?? 0);
+                  const y = Number(props.y ?? 0);
+                  const width = Number(props.width ?? 0);
+                  const height = Number(props.height ?? 0);
+                  const index = props.index;
+                  const viewBox = props.viewBox as { x?: number; width?: number } | undefined;
                   if (index !== hovered) return null;
                   const label = "(click to see details)";
                   const px = 6.2 * label.length; // approx text width at 10.5px mono
@@ -115,7 +121,6 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
                     if (barEnd - 8 - px >= leftEdge) { tx = barEnd - 8; anchor = "end"; }
                     else { tx = barEnd + 8; anchor = "start"; inside = true; }
                   }
-                  const wide = Math.abs(width) > px + 20;
                   return (
                     <text x={tx} y={y + height / 2} dy={3} textAnchor={anchor}
                       style={{ fontFamily: FF.mono, fontSize: 10.5, fill: inside ? t.text : t.muted, letterSpacing: "0.02em" }}>
@@ -153,7 +158,7 @@ export function Chips({
 }: {
   items: { skill: string; freq: number }[];
   color: string;
-  t: any;
+  t: ThemeTokens;
   empty?: string;
 }) {
   if (!items.length)
@@ -206,7 +211,7 @@ export function Chips({
   );
 }
 
-function DiffPanel({ row, onBack, t }: { row: ClusterRow; onBack: () => void; t: any }) {
+function DiffPanel({ row, onBack, t }: { row: ClusterRow; onBack: () => void; t: ThemeTokens }) {
   const d = row.differentiators ?? { a_favoring: [], b_favoring: [] };
   return (
     <div style={{ marginTop: 14, animation: "fadeIn 220ms ease" }}>

@@ -34,7 +34,7 @@ export function PosteriorCurve({ bayes }: { bayes: Bayes }) {
               dataKey="p"
               type="number"
               domain={["dataMin", "dataMax"]}
-              tickFormatter={(v: any) => v.toFixed(2)}
+              tickFormatter={(v) => Number(v).toFixed(2)}
               tick={{ fontSize: 11, fill: t.muted, fontFamily: FF.mono }}
               stroke={t.border}
             />
@@ -48,8 +48,8 @@ export function PosteriorCurve({ bayes }: { bayes: Bayes }) {
                 color: t.text,
                 fontFamily: FF.mono,
               }}
-              labelFormatter={(v: any) => `p = ${v.toFixed(3)}`}
-              formatter={(v: any) => [v.toFixed(2), "density"]}
+              labelFormatter={(v) => `p = ${Number(v).toFixed(3)}`}
+              formatter={(v) => [Number(v).toFixed(2), "density"]}
             />
             <ReferenceLine x={0.5} stroke={t.faint} strokeDasharray="3 3" />
             {lo !== null && <ReferenceLine x={lo} stroke={t.accent} strokeDasharray="2 2" />}

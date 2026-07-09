@@ -34,7 +34,7 @@ export function ScoreDistribution({ dist }: { dist: Distributions }) {
               dataKey="score"
               type="number"
               domain={["dataMin", "dataMax"]}
-              tickFormatter={(v: any) => v.toFixed(2)}
+              tickFormatter={(v) => Number(v).toFixed(2)}
               tick={{ fontSize: 11, fill: t.muted, fontFamily: FF.mono }}
               stroke={t.border}
             />
@@ -48,7 +48,7 @@ export function ScoreDistribution({ dist }: { dist: Distributions }) {
                 color: t.text,
                 fontFamily: FF.mono,
               }}
-              labelFormatter={(v: any) => `score ≈ ${v.toFixed(3)}`}
+              labelFormatter={(v) => `score ≈ ${Number(v).toFixed(3)}`}
             />
             <Area type="monotone" dataKey="a" name="Résumé A" stroke={A} fill="url(#fillA)" strokeWidth={1.5} isAnimationActive={false} />
             <Area type="monotone" dataKey="b" name="Résumé B" stroke={B} fill="url(#fillB)" strokeWidth={1.5} isAnimationActive={false} />
