@@ -1,8 +1,8 @@
 "use client";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "@/lib/providers";
-import { ACC, FF } from "@/lib/theme";
+import { FF } from "@/lib/theme";
+import { Btn } from "@/components/btn";
 import { ExampleVerdict } from "@/components/example-verdict";
 export default function Landing() {
   const { t } = useTheme();
@@ -15,7 +15,7 @@ export default function Landing() {
             {/* left: thesis */}
             <div className="rise">
               <div style={{ fontFamily: FF.mono, fontSize: 11, letterSpacing: "0.16em", color: t.accentText }}>
-                RÉSUMÉ A/B TESTING
+                RÉSUMÉ A/B TESTING · MARKET FIT
               </div>
               <h1
                 style={{
@@ -29,35 +29,51 @@ export default function Landing() {
               >
                 Which résumé wins?
               </h1>
-              <p style={{ fontSize: 18, lineHeight: 1.6, color: t.muted, maxWidth: 440, margin: "22px 0 0" }}>
-                Two versions. 9,014 real jobs. One measured answer.
+              <p style={{ fontSize: 18, lineHeight: 1.6, color: t.muted, maxWidth: 460, margin: "22px 0 0" }}>
+                Compare two versions head-to-head, or score one résumé against the market. Real jobs,
+                one measured answer.
               </p>
-              <div className="flex items-center" style={{ gap: 18, marginTop: 34 }}>
-                <Link
+              <div className="flex items-center" style={{ gap: 14, marginTop: 34, flexWrap: "wrap" }}>
+                <Btn
+                  variant="filled"
                   href="/compare"
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
                     gap: 8,
-                    background: ACC,
-                    color: "var(--on-accent)",
                     fontFamily: FF.display,
                     fontWeight: 600,
                     fontSize: 15.5,
                     padding: "14px 24px",
                     borderRadius: 11,
-                    textDecoration: "none",
-                    boxShadow: "0 8px 24px var(--accent-soft)",
                   }}
                 >
                   Compare résumés <ArrowRight size={17} />
-                </Link>
-                <Link
+                </Btn>
+                <Btn
+                  variant="ghost"
+                  href="/compare?mode=single"
+                  style={{
+                    fontFamily: FF.display,
+                    fontWeight: 600,
+                    fontSize: 15.5,
+                    padding: "14px 24px",
+                    borderRadius: 11,
+                  }}
+                >
+                  Score one résumé
+                </Btn>
+                <Btn
+                  variant="ghost"
+                  borderless
                   href="/how-it-works"
-                  style={{ fontFamily: FF.display, fontWeight: 600, fontSize: 15, color: t.accentText, textDecoration: "none" }}
+                  style={{
+                    fontFamily: FF.display,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    padding: "14px 12px",
+                  }}
                 >
                   How it works
-                </Link>
+                </Btn>
               </div>
             </div>
             {/* right: verdict signature */}

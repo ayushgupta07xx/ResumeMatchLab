@@ -1,4 +1,5 @@
 "use client";
+import { Btn } from "@/components/btn";
 
 import {
   Bar,
@@ -144,11 +145,21 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
   );
 }
 
-function Chips({ items, color, t }: { items: { skill: string; freq: number }[]; color: string; t: any }) {
+export function Chips({
+  items,
+  color,
+  t,
+  empty = "no distinguishing skills in this segment",
+}: {
+  items: { skill: string; freq: number }[];
+  color: string;
+  t: any;
+  empty?: string;
+}) {
   if (!items.length)
     return (
       <span style={{ fontFamily: FF.mono, fontSize: 11.5, color: t.faint, letterSpacing: "0.04em" }}>
-        no distinguishing skills in this segment
+        {empty}
       </span>
     );
   const max = Math.max(...items.map((i) => i.freq), 0.01);
@@ -200,20 +211,17 @@ function DiffPanel({ row, onBack, t }: { row: ClusterRow; onBack: () => void; t:
   return (
     <div style={{ marginTop: 14, animation: "fadeIn 220ms ease" }}>
       <style>{"@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}"}</style>
-      <button
+      <Btn
+        variant="ghost"
         onClick={onBack}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; e.currentTarget.style.color = t.bg; e.currentTarget.style.borderColor = "var(--accent)"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = t.text; e.currentTarget.style.borderColor = "var(--accent)"; }}
         style={{
-          display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20,
+          gap: 8, marginBottom: 20,
           fontFamily: FF.mono, fontSize: 11, fontWeight: 600, textTransform: "uppercase",
-          letterSpacing: "0.08em", color: t.text, background: "transparent",
-          border: `1px solid var(--accent)`, borderRadius: 999, padding: "7px 15px",
-          cursor: "pointer", transition: "all 160ms ease",
+          letterSpacing: "0.08em", padding: "7px 15px",
         }}
       >
         <span style={{ fontSize: 14, lineHeight: 1 }}>{"\u2190"}</span> back to all clusters
-      </button>
+      </Btn>
       <p style={{ fontFamily: FF.display, fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 4px" }}>
         {row.label}
       </p>

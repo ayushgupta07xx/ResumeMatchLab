@@ -1,4 +1,5 @@
 "use client";
+import { Btn } from "@/components/btn";
 
 import { useRef, useState, type CSSProperties } from "react";
 import { UploadCloud, X } from "lucide-react";
@@ -13,26 +14,42 @@ const CARD: CSSProperties = {
   padding: 20,
 };
 
-function Head({ side, color, t }: { side: "A" | "B"; color: string; t: ThemeTokens }) {
+function Head({
+  side,
+  color,
+  t,
+  label,
+  badge,
+}: {
+  side: "A" | "B";
+  color: string;
+  t: ThemeTokens;
+  label?: string;
+  badge?: string;
+}) {
+  const glyph = badge ?? side;
+  const text = label ?? `Résumé ${side}`;
   return (
     <div className="flex items-center" style={{ gap: 9 }}>
-      <span
-        style={{
-          fontFamily: FF.display,
-          display: "grid",
-          placeItems: "center",
-          width: 22,
-          height: 22,
-          borderRadius: 6,
-          background: `${color}22`,
-          color,
-          fontSize: 12.5,
-          fontWeight: 700,
-        }}
-      >
-        {side}
-      </span>
-      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.muted }}>Résumé {side}</span>
+      {glyph ? (
+        <span
+          style={{
+            fontFamily: FF.display,
+            display: "grid",
+            placeItems: "center",
+            width: 22,
+            height: 22,
+            borderRadius: 6,
+            background: `${color}22`,
+            color,
+            fontSize: 12.5,
+            fontWeight: 700,
+          }}
+        >
+          {glyph}
+        </span>
+      ) : null}
+      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.muted }}>{text}</span>
     </div>
   );
 }
@@ -42,11 +59,15 @@ export function UploadZone({
   color,
   file,
   onChange,
+  label,
+  badge,
 }: {
   side: "A" | "B";
   color: string;
   file: File | null;
   onChange: (f: File | null) => void;
+  label?: string;
+  badge?: string;
 }) {
   const { t } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +83,7 @@ export function UploadZone({
     return (
       <div style={CARD}>
         <div className="flex items-center justify-between" style={{ gap: 10 }}>
-          <Head side={side} color={color} t={t} />
+          <Head side={side} color={color} t={t} label={label} badge={badge} />
           <button
             onClick={() => {
               onChange(null);
@@ -152,7 +173,7 @@ export function UploadZone({
         transition: "border-color .15s, background .15s",
       }}
     >
-      <Head side={side} color={color} t={t} />
+      <Head side={side} color={color} t={t} label={label} badge={badge} />
 
       <div style={{ display: "flex", gap: 4, marginTop: 16, padding: 3, background: "var(--accent-soft)", borderRadius: 10 }}>
         {seg("upload", "Upload file")}
@@ -202,7 +223,8 @@ export function UploadZone({
               outline: "none",
             }}
           />
-          <button
+          <Btn
+            variant="ghost"
             onClick={() => {
               if (text.trim().length >= 1) {
                 onChange(new File([text], "Pasted text.txt", { type: "text/plain" }));
@@ -214,17 +236,13 @@ export function UploadZone({
               marginTop: 10,
               padding: "9px 0",
               borderRadius: 9,
-              border: "none",
-              cursor: text.trim() ? "pointer" : "default",
-              background: text.trim() ? "var(--accent)" : "var(--accent-soft)",
-              color: text.trim() ? "var(--on-accent)" : t.faint,
               fontFamily: FF.body,
               fontSize: 13,
               fontWeight: 600,
             }}
           >
             Use this text
-          </button>
+          </Btn>
         </div>
       )}
     </div>

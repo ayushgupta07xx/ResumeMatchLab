@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { CompareResponse } from "@/lib/types";
+import type { CompareResponse, FitResponse } from "@/lib/types";
 import { THEME, type ThemeTokens } from "@/lib/theme";
 
 type Mode = "dark" | "light";
@@ -19,7 +19,11 @@ const ResultsCtx = createContext<{
   setResult: (r: CompareResponse | null) => void;
   names: ResumeNames | null;
   setNames: (n: ResumeNames | null) => void;
-}>({ result: null, setResult: () => {}, names: null, setNames: () => {} });
+  fitResult: FitResponse | null;
+  setFitResult: (r: FitResponse | null) => void;
+  fitName: string | null;
+  setFitName: (n: string | null) => void;
+}>({ result: null, setResult: () => {}, names: null, setNames: () => {}, fitResult: null, setFitResult: () => {}, fitName: null, setFitName: () => {} });
 
 export function Providers({ children }: { children: ReactNode }) {
   // In-memory only (mirrors JobAtlas) — resets to dark on reload, never persisted.
@@ -27,12 +31,14 @@ export function Providers({ children }: { children: ReactNode }) {
   // Resume-derived report is held in memory and never written to storage.
   const [result, setResult] = useState<CompareResponse | null>(null);
   const [names, setNames] = useState<ResumeNames | null>(null);
+  const [fitResult, setFitResult] = useState<FitResponse | null>(null);
+  const [fitName, setFitName] = useState<string | null>(null);
 
   return (
     <ThemeCtx.Provider
       value={{ mode, t: THEME[mode], toggle: () => setMode((m) => (m === "dark" ? "light" : "dark")) }}
     >
-      <ResultsCtx.Provider value={{ result, setResult, names, setNames }}>{children}</ResultsCtx.Provider>
+      <ResultsCtx.Provider value={{ result, setResult, names, setNames, fitResult, setFitResult, fitName, setFitName }}>{children}</ResultsCtx.Provider>
     </ThemeCtx.Provider>
   );
 }

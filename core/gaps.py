@@ -21,6 +21,20 @@ _SKILL_PATS: dict[str, re.Pattern] = {
 TOP_N = 6
 MIN_FREQ = 0.05  # skip skills present in <5% of a cluster's postings (noise floor)
 
+# Discipline/role labels that are real skills for *detection* but read wrong as
+# a "you're missing X" suggestion. Filtered from gap output only, not detection.
+EXCLUDE_FROM_GAPS: frozenset[str] = frozenset(
+    {
+        "machine learning",
+        "deep learning",
+        "data engineering",
+        "data science",
+        "product management",
+        "nlp",
+        "experimentation",
+    }
+)
+
 _CORPUS_REF: dict[int, object] = {}
 
 
@@ -100,6 +114,6 @@ def cluster_gaps(
         out[cid] = [
             {"skill": name, "freq": round(f, 3)}
             for name, f in _cluster_skill_freq(cid, id(corpus))
-            if f >= MIN_FREQ and name not in have
+            if f >= MIN_FREQ and name not in have and name not in EXCLUDE_FROM_GAPS
         ][:TOP_N]
     return out

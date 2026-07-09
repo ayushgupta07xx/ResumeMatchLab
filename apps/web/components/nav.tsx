@@ -1,4 +1,5 @@
 "use client";
+import { Btn } from "@/components/btn";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,39 +38,34 @@ export function Nav() {
           </span>
         </Link>
         <div className="flex items-center" style={{ gap: 22 }}>
-          <button
+          <Btn
+            variant="ghost"
+            borderless
             onClick={toggle}
             aria-label={isDark ? "Light mode" : "Dark mode"}
             style={{
-              display: "grid",
-              placeItems: "center",
               width: 34,
               height: 34,
-              border: "none",
-              background: "transparent",
-              color: t.text,
-              cursor: "pointer",
+              padding: 0,
+              borderRadius: 999,
             }}
           >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <Link
+          </Btn>
+          <Btn
+            variant="ghost"
             href="/about"
+            active={onAbout}
             style={{
               fontFamily: FF.body,
               fontSize: 13.5,
               fontWeight: 600,
-              color: onAbout ? t.text : t.muted,
-              textDecoration: "none",
               padding: "7px 15px",
               borderRadius: 9,
-              border: `1px solid ${onAbout ? "var(--accent)" : "var(--accent-soft)"}`,
-              background: onAbout ? "var(--accent-tint)" : "transparent",
-              transition: "color .15s ease, border-color .15s ease, background .15s ease",
             }}
           >
             About
-          </Link>
+          </Btn>
         </div>
       </div>
     </nav>

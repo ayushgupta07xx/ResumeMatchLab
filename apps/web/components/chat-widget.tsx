@@ -328,10 +328,22 @@ export function ChatWidget() {
                   <button
                     key={s}
                     onClick={() => send(s)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = t.text;
+                      e.currentTarget.style.color = t.bg;
+                      e.currentTarget.style.borderColor = t.text;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = t.muted;
+                      e.currentTarget.style.borderColor = t.border;
+                    }}
                     style={{
-                      textAlign: "left", fontFamily: FF.body, fontSize: 12.5, color: t.muted,
-                      background: "rgba(255,255,255,0.03)", border: `1px solid ${t.border}`,
+                      width: "100%", textAlign: "left", fontFamily: FF.body, fontSize: 12.5,
+                      color: t.muted, background: "transparent",
+                      border: `1px solid ${t.border}`,
                       borderRadius: 10, padding: "9px 12px", cursor: "pointer",
+                      transition: "all 140ms ease",
                     }}
                   >
                     {s}

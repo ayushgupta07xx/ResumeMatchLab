@@ -20,10 +20,15 @@ git lfs install
 git lfs track "*.parquet"
 
 # 2. Sync engine + data from main (exclude caches/venv/tests/docs).
-for d in core stats parsers apps data embeddings; do
+for d in core stats parsers data embeddings; do
   rsync -a --delete --exclude '__pycache__' --exclude '*.pyc' \
     "${REPO_ROOT}/${d}/" "${SPACE_DIR}/${d}/"
 done
+# API package only — NOT apps/web (the frontend lives on Vercel).
+mkdir -p "${SPACE_DIR}/apps/api"
+rsync -a --delete --exclude '__pycache__' --exclude '*.pyc' \
+  "${REPO_ROOT}/apps/api/" "${SPACE_DIR}/apps/api/"
+cp "${REPO_ROOT}/apps/__init__.py" "${SPACE_DIR}/apps/__init__.py"
 cp "${REPO_ROOT}/requirements.txt" "${SPACE_DIR}/requirements.txt"
 
 # 3. Root Dockerfile (paths root-relative; pre-bakes BGE so the first call is fast).
@@ -45,7 +50,8 @@ RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTr
 COPY core ./core
 COPY stats ./stats
 COPY parsers ./parsers
-COPY apps ./apps
+COPY apps/__init__.py ./apps/__init__.py
+COPY apps/api ./apps/api
 COPY data ./data
 COPY embeddings ./embeddings
 

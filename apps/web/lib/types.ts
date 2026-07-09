@@ -131,3 +131,34 @@ export interface CompareResponse {
   clusters: ClusterRow[];
   inputs?: { resume_a: InputMeta; resume_b: InputMeta };
 }
+
+export interface FitSkill {
+  skill: string;
+  freq: number;
+}
+
+export interface FitCoverage {
+  skills_ratio: number | null;
+  quantified: number;
+  sections: { experience: boolean; education: boolean; skills: boolean; projects: boolean };
+}
+
+export interface FitClusterRow {
+  cluster_id: number;
+  label: string;
+  n: number;
+  mean_score: number;
+  percentile: number;
+  role_fit: number;
+  matched_skills: FitSkill[];
+  missing_skills: FitSkill[];
+  coverage: FitCoverage;
+}
+
+export interface FitResponse {
+  mode: "single_fit";
+  overall: { mean_score: number; n_jobs: number; best_score: number };
+  clusters: FitClusterRow[];
+  top_clusters: string[];
+  weak_clusters: string[];
+}

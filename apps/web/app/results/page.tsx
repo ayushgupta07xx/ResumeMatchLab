@@ -1,4 +1,5 @@
 "use client";
+import { Btn } from "@/components/btn";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -71,25 +72,20 @@ export default function ResultsPage() {
             "Comparison report"
           )}
         </div>
-        <button
+        <Btn
+          variant="ghost"
           onClick={() => downloadReport(result, names)}
           style={{
-            display: "inline-flex",
-            alignItems: "center",
             gap: 8,
-            background: "transparent",
-            border: `1px solid var(--accent)`,
             borderRadius: 10,
             padding: "8px 16px",
             fontSize: 13,
             fontWeight: 600,
-            color: t.text,
-            cursor: "pointer",
             fontFamily: FF.body,
           }}
         >
           <Download size={15} /> Download report (PDF)
-        </button>
+        </Btn>
       </div>
 
       <div
@@ -120,21 +116,18 @@ export default function ResultsPage() {
       <ClusterTable clusters={result.clusters} />
 
       <div>
-        <Link
+        <Btn
+          variant="ghost"
           href="/compare"
           style={{
-            display: "inline-flex",
-            border: `1px solid var(--accent)`,
             borderRadius: 11,
             padding: "10px 20px",
             fontSize: 14,
             fontWeight: 600,
-            color: t.text,
-            textDecoration: "none",
           }}
         >
           Compare another pair
-        </Link>
+        </Btn>
       </div>
     </main>
   );
