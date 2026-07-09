@@ -103,6 +103,12 @@ export function MdePanel({ effect, nJobs }: { effect: Effect; nJobs: number }) {
           </tbody>
         </table>
       </div>
+      <div style={{ padding: "8px 16px 0", fontSize: 10.5, color: t.muted }}>
+        <span style={{ background: "var(--accent-soft)", padding: "1px 6px", borderRadius: 4 }}>
+          highlighted
+        </span>{" "}
+        = conventional operating point (&alpha;=0.05, 80% power).
+      </div>
       <div style={{ padding: "10px 16px", fontSize: 11, color: t.muted, borderTop: `1px solid var(--accent-soft)` }}>
         Achieved power {((effect.achieved_power ?? 0) * 100).toFixed(0)}% at N={nJobs.toLocaleString()} paired jobs · required N for 80% power ={" "}
         {Math.round(effect.required_n_80 ?? 0)}.

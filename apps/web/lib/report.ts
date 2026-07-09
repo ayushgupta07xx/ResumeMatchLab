@@ -43,7 +43,7 @@ export async function downloadReport(
   }
   const ci = lo !== null && hi !== null ? `[${fmtPts(lo)}, ${fmtPts(hi)}]` : "[—]";
   write(
-    `Δ ${fmtPts(verdict.mean_delta_points ?? 0, 2, true)} pts    95% CI ${ci}    ` +
+    `Delta ${fmtPts(verdict.mean_delta_points ?? 0, 2, true)} pts    95% CI ${ci}    ` +
       `p ${fmtP(verdict.p_value)}    d ${fmtPts(verdict.cohens_d ?? 0)}    (${verdict.confidence} confidence)`,
     9,
     false,
@@ -56,21 +56,21 @@ export async function downloadReport(
     [tests.primary.name, `p ${fmtP(tests.primary.pvalue)}`],
     [
       "CUPED variance reduction",
-      `${fmtPct((cuped.variance_reduction ?? 0) * 100, 1)} · ×${(cuped.effective_n_multiplier ?? 1).toFixed(2)} eff. N`,
+      `${fmtPct((cuped.variance_reduction ?? 0) * 100, 1)} | x${(cuped.effective_n_multiplier ?? 1).toFixed(2)} eff. N`,
     ],
     ["mSPRT (always-valid)", `p ${fmtP(sequential.always_valid_p)}`],
     [
       "Power / required N",
-      `${fmtPct((effect.achieved_power ?? 0) * 100, 0)} · N≥${Math.round(effect.required_n_80 ?? 0)}`,
+      `${fmtPct((effect.achieved_power ?? 0) * 100, 0)} | N>=${Math.round(effect.required_n_80 ?? 0)}`,
     ],
     ["Cohen's d", fmtPts(effect.cohens_d ?? 0)],
   ];
   stats.forEach(([k, v]) => write(`${k}:   ${v}`, 9, false, 15));
   y += 10;
 
-  write("Per-cluster breakdown  (Δ = B − A, percentage points)", 12, true, 18);
+  write("Per-cluster breakdown  (Delta = B - A, percentage points)", 12, true, 18);
   const cols = [L, 205, 245, 300, 400, 470, 500];
-  const head = ["Cluster", "n", "Δ pts", "95% CI", "p (BH)", "Win", "Sig"];
+  const head = ["Cluster", "n", "Delta pts", "95% CI", "p (BH)", "Win", "Sig"];
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(20);
@@ -95,10 +95,35 @@ export async function downloadReport(
     y += 15;
   });
 
+  // Minimum detectable effect grid (Cohen's d over alpha x power).
+  const mde = effect.mde ?? [];
+  if (mde.length) {
+    y += 16;
+    write("Minimum detectable effect  (Cohen's d, alpha x power)", 12, true, 18);
+    const alphaKeys = Object.keys(mde[0])
+      .filter((k) => k !== "power")
+      .sort((a, b) => parseFloat(a.split("=")[1]) - parseFloat(b.split("=")[1]));
+    const mcols = [L, 205, 305, 405];
+    const mhead = ["power \\ alpha", ...alphaKeys.map((k) => k.replace("alpha=", "a="))];
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(20);
+    mhead.forEach((h, i) => doc.text(h, mcols[i], y));
+    y += 4;
+    doc.setDrawColor(180);
+    doc.line(L, y, 540, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    mde.forEach((r) => {
+      doc.text(`${Math.round((r.power as number) * 100)}%`, mcols[0], y);
+      alphaKeys.forEach((ak, i) => doc.text((r[ak] ?? 0).toFixed(4), mcols[i + 1], y));
+      y += 15;
+    });
+  }
   y += 12;
   doc.setFontSize(8);
   doc.setTextColor(120);
-  doc.text("Validated against a simulated cohort · ResumeMatch Lab", L, y);
+  doc.text("Validated against a simulated cohort | ResumeMatch Lab", L, y);
 
   doc.save("resumematch-report.pdf");
 }

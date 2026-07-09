@@ -156,6 +156,20 @@ def _fit_context(result: dict) -> str:
     return "\n".join(lines)
 
 
+def _mde_summary(mde: list | None) -> str:
+    """One-line MDE grid: each power row with its alpha=0.05 floor (the
+    conventional operating point), plus the strictest/loosest corners."""
+    if not mde:
+        return "not available"
+    parts = []
+    for row in mde:
+        power = row.get("power")
+        a05 = row.get("alpha=0.05")
+        if power is not None and a05 is not None:
+            parts.append(f"{int(power * 100)}% power -> d>={a05}")
+    return "; ".join(parts) if parts else "not available"
+
+
 def _result_context(result: dict | None) -> str:
     """Compact the result JSON into a grounding block the model can cite."""
     if not result:
@@ -184,9 +198,16 @@ def _result_context(result: dict | None) -> str:
         f"- mean_delta_points: {v.get('mean_delta_points')}, ci_points: {v.get('ci_points')}, "
         f"p={v.get('p_value')}, cohens_d={v.get('cohens_d')}, confidence={v.get('confidence')}",
         f"- effect: achieved_power={eff.get('achieved_power')}, required_n_80={eff.get('required_n_80')}",
+        "- mde (minimum detectable effect, Cohen's d; rows=power, cols=alpha): "
+        + _mde_summary(eff.get("mde")),
         f"- cuped: variance_reduction={cu.get('variance_reduction')}, "
         f"effective_n_multiplier={cu.get('effective_n_multiplier')}",
         f"- bayes: P(B>A)={ba.get('prob_b_beats_a')}, credible_interval={ba.get('credible_interval')}",
+        f"- cluster win-counts (authoritative — use these, do not recount): "
+        f"A wins {sum(1 for c in result.get('clusters', []) if c.get('winner') == 'A')}, "
+        f"B wins {sum(1 for c in result.get('clusters', []) if c.get('winner') == 'B')}, "
+        f"tie {sum(1 for c in result.get('clusters', []) if c.get('winner') == 'tie')} "
+        f"of {len(result.get('clusters', []))}",
         "- per-cluster: " + " | ".join(clusters),
     ]
     return "\n".join(lines)
@@ -234,7 +255,26 @@ def _page_line(page: str | None) -> str:
     return f"The user is currently viewing {desc}" if desc else f"The user is on {page}."
 
 
-def groq_chat(messages: list[dict], result: dict | None = None, page: str | None = None) -> str:
+def _length_directive(mode: str) -> str:
+    """Answer-length steer. Soft targets — the model won't hit exact counts,
+    but brief stays tight and bulleted, detailed goes fuller."""
+    if mode == "detailed":
+        return (
+            "ANSWER LENGTH: give a fuller explanation, aim ~250 words. Prose or "
+            "bullets as fits; still lead with the direct answer, no filler."
+        )
+    return (
+        "ANSWER LENGTH: be concise — bullet points, aim ~120 words. Lead with the "
+        "direct answer; no preamble, no restating the question."
+    )
+
+
+def groq_chat(
+    messages: list[dict],
+    result: dict | None = None,
+    page: str | None = None,
+    mode: str = "brief",
+) -> str:
     """Grounded chat: system prompt + result context + user turns. No tools."""
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
@@ -242,7 +282,14 @@ def groq_chat(messages: list[dict], result: dict | None = None, page: str | None
     model = os.environ.get("GROQ_MODEL", DEFAULT_MODEL)
     convo = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "system", "content": _page_line(page) + "\n" + _result_context(result)},
+        {
+            "role": "system",
+            "content": _page_line(page)
+            + "\n"
+            + _result_context(result)
+            + "\n"
+            + _length_directive(mode),
+        },
         *messages,
     ]
     msg = _call(api_key, model, convo)

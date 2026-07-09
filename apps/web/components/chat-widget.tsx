@@ -146,6 +146,7 @@ export function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [size, setSize] = useState({ w: 372, h: 520 });
+  const [mode, setMode] = useState<"brief" | "detailed">("brief");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -206,6 +207,7 @@ export function ChatWidget() {
           messages: next.filter((m) => m.role === "user" || m.role === "assistant"),
           result: fitResult ?? result ?? null,
           page: pathname,
+          mode,
         }),
       });
       if (!res.ok) {
@@ -297,6 +299,18 @@ export function ChatWidget() {
             <span style={{ fontFamily: FF.display, fontSize: 14, fontWeight: 700, color: t.text }}>
               ResumeMatch assistant
             </span>
+            <button
+              onClick={() => setMode((mo) => (mo === "brief" ? "detailed" : "brief"))}
+              title="Toggle answer length"
+              style={{
+                fontFamily: FF.body, fontSize: 11.5, color: t.muted,
+                background: "transparent", border: `1px solid ${t.border}`,
+                borderRadius: 999, padding: "3px 10px", cursor: "pointer",
+                textTransform: "capitalize", transition: "all 140ms ease",
+              }}
+            >
+              {mode}
+            </button>
           </div>
 
           <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>

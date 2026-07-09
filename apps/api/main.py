@@ -93,6 +93,7 @@ class ChatBody(BaseModel):
     messages: list[dict]
     result: dict | None = None
     page: str | None = None
+    mode: str = "brief"
 
 
 @app.post("/chat")
@@ -101,7 +102,7 @@ async def chat(body: ChatBody) -> dict:
     if not msgs:
         raise HTTPException(status_code=422, detail="Send at least one user message.")
     try:
-        reply = await run_in_threadpool(groq_chat, msgs, body.result, body.page)
+        reply = await run_in_threadpool(groq_chat, msgs, body.result, body.page, body.mode)
     except GroqError as e:
         reason = str(e)
         if reason == "unconfigured":
