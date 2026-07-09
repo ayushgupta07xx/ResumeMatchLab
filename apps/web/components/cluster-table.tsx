@@ -28,7 +28,7 @@ export function ClusterTable({ clusters }: { clusters: ClusterRow[] }) {
         Per-cluster breakdown
       </h3>
       <p style={{ fontSize: 13, color: t.muted, margin: "6px 0 14px" }}>
-        Δ is B − A in percentage points. Significance uses Benjamini–Hochberg FDR across the 8 clusters.
+        Δ is B − A in percentage points. Significance uses Benjamini–Hochberg FDR across the 9 clusters.
       </p>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>

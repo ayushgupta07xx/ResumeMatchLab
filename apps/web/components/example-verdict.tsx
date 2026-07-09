@@ -112,7 +112,7 @@ export function ExampleVerdict() {
         style={{ fontFamily: FF.mono, fontSize: 9.5, color: t.faint, marginTop: 10, letterSpacing: "0.04em" }}
       >
         <span>{"\u25C0"} A WINS</span>
-        <span>8 clusters</span>
+        <span>9 clusters</span>
         <span>B WINS {"\u25B6"}</span>
       </div>
     </div>

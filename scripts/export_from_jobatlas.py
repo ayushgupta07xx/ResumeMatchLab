@@ -2,7 +2,7 @@
 
 Pulls all active, de-duplicated Indian tech jobs together with their
 pre-computed ``BAAI/bge-small-en-v1.5`` (384-dim, L2-normalized) embeddings,
-then runs K-means (k=8) to assign stable cluster labels for stratified
+then runs K-means (k=9) to assign stable cluster labels for stratified
 analysis. Reusing JobAtlas's corpus means both portfolio projects share one job
 universe and identical embeddings -- a deliberate consistency story.
 
@@ -27,7 +27,7 @@ from sqlalchemy import create_engine, text
 REPO = Path(__file__).resolve().parents[1]
 JOBATLAS_ENV = Path.home() / "code" / "JobAtlas" / ".env"
 
-K = 8
+K = 9
 SEED = 42
 
 JOBS_OUT = REPO / "data" / "jobs_snapshot" / "jobs.parquet"
@@ -78,7 +78,14 @@ LABEL_RULES = [
     ("Data Engineering", ("data engineer", "etl", "pipeline", "spark", "warehouse", "big data")),
     (
         "Data & Analytics",
-        ("data analyst", "analytics", "business intelligence", "tableau", "power bi"),
+        (
+            "data analyst",
+            "business analyst",
+            "analytics",
+            "business intelligence",
+            "tableau",
+            "power bi",
+        ),
     ),
     (
         "Machine Learning / AI",
@@ -97,11 +104,31 @@ LABEL_RULES = [
         ("frontend", "front end", "react", "angular", "android", "ios", "flutter"),
     ),
     (
-        "Product Management",
-        ("product manager", "product owner", "program manager", "product analyst"),
+        "Product / Project Management",
+        (
+            "product manager",
+            "product owner",
+            "program manager",
+            "product analyst",
+            "project manager",
+            "technical program",
+            "delivery manager",
+            "scrum master",
+        ),
     ),
     ("Design / UX", ("designer", "ux", "ui/ux", "graphic", "creative")),
-    ("QA / Testing", ("qa ", "quality assurance", "test engineer", "sdet", "automation test")),
+    (
+        "Software Engineering / QA",
+        (
+            "software engineer",
+            "sde",
+            "sdet",
+            "qa ",
+            "quality assurance",
+            "test engineer",
+            "automation test",
+        ),
+    ),
     ("Security", ("security", "infosec", "penetration", "soc ")),
     ("Marketing / Sales", ("marketing", "sales", "growth", "seo")),
 ]
@@ -187,6 +214,7 @@ def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
             cov[cid][name] = hits / n if n else 0.0
 
     MIN_COV = 0.15  # below this, no rule really describes the cluster
+
     pairs = sorted(
         ((cov[cid][name], cid, name) for cid in cov for name, _ in rules),
         reverse=True,
@@ -248,25 +276,28 @@ def label_clusters(titles_by_cluster: dict[int, list[str]]) -> dict[int, str]:
         "contract",
         "machine",
         "learning",
+        "data",
+        "business",
+        "global",
+        "financial",
+        "world",
+        "digital",
+        "company",
+        "enterprise",
     }
     mixed = [cid for cid in titles_by_cluster if cid not in out]
-    tf: dict[int, dict[str, int]] = {}
-    doc_freq: dict[str, int] = {}
-    for cid in mixed:
-        counts: dict[str, int] = {}
-        for title in titles_by_cluster[cid]:
-            for tok in set(re.findall(r"[a-z+#]+", title.lower())):
-                if len(tok) > 2 and tok not in _GENERIC:
-                    counts[tok] = counts.get(tok, 0) + 1
-        tf[cid] = counts
-        for tok in counts:
-            doc_freq[tok] = doc_freq.get(tok, 0) + 1
-    for cid in mixed:
-        n = max(len(titles_by_cluster[cid]), 1)
-        scored = sorted(((cnt / n) / doc_freq.get(tok, 1), tok) for tok, cnt in tf[cid].items())
-        picks = [tok for _, tok in scored[-2:][::-1]]
-        labels = [w.upper() if len(w) <= 3 else w.title() for w in picks]
-        out[cid] = f"Mixed — {'/'.join(labels)}" if labels else "Mixed / General"
+    # Clusters no rule describes are boilerplate-dominated generalist buckets
+    # (enterprise job-post filler, IT-services ops) with no crisp segment. We
+    # name them deterministically by SIZE rank rather than by a distinctive-term
+    # lottery (which surfaced noise like 'Vice/President'). Honest: these are
+    # explicitly the residual, not a claimed specialty.
+    GENERALIST_NAMES = [
+        "Mixed — Enterprise/Generalist",
+        "Mixed — IT Services/Ops",
+        "Mixed — Other",
+    ]
+    for rank, cid in enumerate(sorted(mixed, key=lambda c: -len(titles_by_cluster[c]))):
+        out[cid] = GENERALIST_NAMES[min(rank, len(GENERALIST_NAMES) - 1)]
     return dict(sorted(out.items()))
 
 

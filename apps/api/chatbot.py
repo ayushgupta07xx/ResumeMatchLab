@@ -53,16 +53,18 @@ WHAT EACH METRIC MEANS (explain in plain terms; use the live numbers you are giv
   significance. ~0.2 small, ~0.5 medium, ~0.8 large. A big sample can make a trivial
   gap significant; d tells you if it's practically meaningful.
 - CUPED variance reduction: uses pre-experiment job covariates (cluster, description
-  length) to strip out variance unrelated to the resumes, tightening the estimate. "43%
-  variance reduction, x1.78 effective N" means the CI is as tight as a ~78% bigger
-  sample would give. It never changes which resume wins — only the precision.
+  length) to strip out variance unrelated to the resumes, tightening the estimate. A
+  reported "40% variance reduction, x1.67 effective N" means the CI is as tight as a
+  ~67% bigger sample would give. It never changes which resume wins — only the precision.
+  (Use the actual figures from THIS comparison, shown in the results.)
 - mSPRT (always-valid p): a sequential test whose p-value stays valid even if you peek
   as jobs stream in — no inflated false positives from optional stopping.
 - Bayesian Beta-Binomial posterior: treats each job as a win/loss for B and gives the
-  probability that B beats A on a given job, with a credible interval. "P(B>A)=0.28"
-  means B out-scores A on about 28% of jobs.
-- Per-cluster breakdown with BH-FDR: the same test run inside each of the 8 job
-  clusters, with a Benjamini-Hochberg correction so testing 8 clusters at once doesn't
+  probability that B beats A on a given job, with a credible interval. A posterior
+  mean near 0.29 would mean B out-scores A on roughly 29% of jobs. (Use the actual
+  figure from THIS comparison, shown in the results.)
+- Per-cluster breakdown with BH-FDR: the same test run inside each of the 9 job
+  clusters, with a Benjamini-Hochberg correction so testing 9 clusters at once doesn't
   inflate false positives. This can reveal a resume winning overall yet LOSING the
   clusters it targets (a Simpson's-paradox reversal).
 
@@ -76,10 +78,11 @@ HOW TO READ THE CHARTS
   of zero favor B, left favor A; an interval crossing zero is not significant there.
 
 THE CLUSTERS
-- The 8 clusters are K-means groups of the job corpus, labeled by their dominant titles.
-  Some are crisp (Data Engineering, Machine Learning / AI, DevOps / SRE / Cloud,
-  Frontend / Backend / Full-stack); others are genuinely mixed and labeled "Mixed — <top terms>" (e.g. "Mixed —
-  Business/Advisory") to stay distinguishable, rather than forced into a crisp name the
+- The 9 clusters are K-means groups of the job corpus, labeled by their dominant titles.
+  Most are crisp (Data & Analytics, Data Engineering, Machine Learning / AI, DevOps / SRE / Cloud,
+  Frontend / Backend / Full-stack, Product / Project Management, Software Engineering / QA); the
+  two boilerplate-dominated residual clusters have no crisp segment and are named "Mixed —
+  Enterprise/Generalist" and "Mixed — IT Services/Ops" rather than forced into a specialty the
   jobs don't support. A cluster is a rough segment of the market, not a recruiter's verdict.
 
 YOUR RULES

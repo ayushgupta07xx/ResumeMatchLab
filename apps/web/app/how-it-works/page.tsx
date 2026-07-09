@@ -108,7 +108,7 @@ const STEPS: Step[] = [
     n: "09",
     title: "Per-cluster breakdown with FDR control",
     q: "Where does each résumé pull ahead?",
-    body: "The same test runs inside each of the 8 job clusters. Bonferroni and Benjamini\u2013Hochberg corrections keep significance honest across 8 simultaneous comparisons.",
+    body: "The same test runs inside each of the 9 job clusters. Bonferroni and Benjamini\u2013Hochberg corrections keep significance honest across 9 simultaneous comparisons.",
     tex: [String.raw`\text{Bonferroni: }\alpha_{\text{adj}}=\tfrac{\alpha}{m},\qquad \text{BH: reject if }p_{(k)}\le\tfrac{k}{m}\,\alpha\quad(m=8)`],
   },
 ];
