@@ -14,6 +14,7 @@ import { ForestPlot } from "@/components/forest-plot";
 import { ScoreDistribution } from "@/components/score-distribution";
 import { PosteriorCurve } from "@/components/posterior-curve";
 import { ClusterTable } from "@/components/cluster-table";
+import { MdePanel } from "@/components/mde-panel";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -106,6 +107,7 @@ export default function ResultsPage() {
         ))}
       </div>
 
+      <MdePanel effect={effect} nJobs={result.summary.n_jobs} />
       <ForestPlot clusters={result.clusters} />
 
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
