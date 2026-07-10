@@ -273,8 +273,9 @@ export function ChatWidget() {
         )}
       </button>
 
-      {open && (
         <div
+          className={open ? "rm-panel rm-open" : "rm-panel"}
+          aria-hidden={!open}
           style={{
             position: "fixed", bottom: 84, right: 20, zIndex: 50,
             width: size.w, height: size.h,
@@ -417,7 +418,6 @@ export function ChatWidget() {
             </div>
           </div>
         </div>
-      )}
     </>
   );
 }

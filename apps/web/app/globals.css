@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 :focus-visible {
   outline: 2px solid var(--accent, #8A93A0);
   outline-offset: 3px;
@@ -25,15 +30,74 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .rise {
-    animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: rise 0.6s var(--ease) both;
   }
   .rise2 {
-    animation: rise 0.6s 0.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: rise 0.6s 0.1s var(--ease) both;
   }
   .rise3 {
-    animation: rise 0.7s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: rise 0.7s 0.3s var(--ease) both;
   }
 }
 .spin {
   animation: spin 0.9s linear infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  [role="button"],
+  input,
+  textarea,
+  select {
+    transition:
+      color 0.3s var(--ease),
+      background-color 0.3s var(--ease),
+      border-color 0.3s var(--ease),
+      box-shadow 0.3s var(--ease),
+      transform 0.3s var(--ease),
+      opacity 0.3s var(--ease);
+  }
+}
+
+.rm-panel {
+  opacity: 0;
+  transform: translateY(12px) scale(0.94);
+  transform-origin: bottom right;
+  pointer-events: none;
+}
+.rm-panel.rm-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rm-panel {
+    transition: transform 0.7s var(--ease-out), opacity 0.5s var(--ease-out);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button:not(:disabled):hover,
+  a:hover,
+  [role="button"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
+  }
+  button:not(:disabled):active,
+  a:active,
+  [role="button"]:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: none;
+  }
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: pageEnter 0.7s var(--ease-out) both;
+  }
 }
