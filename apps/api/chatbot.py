@@ -23,11 +23,21 @@ MAX_TURNS = 12
 TIMEOUT_S = 30
 
 SYSTEM_PROMPT = """You are the product guide for ResumeMatch Lab, a statistical
-A/B-testing tool for resumes, built by Ayush Gupta (GitHub: ayushgupta07xx).
-You work on every page, so a visitor can understand the product WITHOUT running a
-comparison first — explain concepts and the product generally when no result is present. A user uploads two versions of a resume; the tool
-scores each against 9,014 real Indian tech job postings and runs a full statistics
-pipeline to say which version matches the market better, by how much, and where.
+tool for resumes, built by Ayush Gupta (GitHub: ayushgupta07xx).
+You work on every page, so a visitor can understand the product WITHOUT running
+anything first — explain concepts and the product generally when no result is present.
+
+The tool has TWO modes, both scoring against 9,014 real Indian tech job postings:
+1. COMPARE (A/B): the user uploads two versions of one resume; the tool runs a full
+   statistical pipeline to say which version matches the market better, by how much,
+   and in which job segments. This is the primary mode and most metrics below describe it.
+2. SINGLE FIT: the user scores ONE resume against the market. Instead of an A/B verdict,
+   it returns a per-cluster "Role Fit" — a 0-100 percentile of how well the resume
+   matches each of the 9 job clusters (ranked against every corpus job's match to that
+   cluster), plus matched skills, missing skills, and section coverage. Use this to help
+   a user see which roles they lean toward and what to add. When a single-fit result is
+   present, ground your answer in its role_fit percentiles and matched/missing skills.
+
 You explain what the tool does, what its numbers mean, and how to read its charts.
 You are friendly, concise, and above all HONEST.
 
@@ -241,9 +251,11 @@ def _call(api_key: str, model: str, convo: list[dict]) -> dict:
 
 _PAGE_MAP = {
     "/": "the home page — product intro with an example verdict.",
-    "/compare": "the upload page, where the user adds two resume versions (A and B) to compare.",
+    "/compare": "the upload page — the user adds two resume versions (A and B) to compare, or switches to single-resume mode to score one resume against the market.",
+    "/fit": "the single-resume fit page, where the user scores one resume against the job market.",
     "/how-it-works": "the methodology page explaining the statistical pipeline stage by stage.",
-    "/results": "the results page — this comparison's verdict, metric cards, charts, and per-cluster breakdown.",
+    "/results": "the A/B results page — this comparison's verdict, metric cards, charts, and per-cluster breakdown.",
+    "/fit/results": "the single-resume fit results — per-cluster Role Fit percentiles, matched and missing skills, and section coverage.",
     "/about": "the About page describing the product and its maker.",
 }
 
@@ -260,12 +272,16 @@ def _length_directive(mode: str) -> str:
     but brief stays tight and bulleted, detailed goes fuller."""
     if mode == "detailed":
         return (
-            "ANSWER LENGTH: give a fuller explanation, aim ~250 words. Prose or "
-            "bullets as fits; still lead with the direct answer, no filler."
+            "ANSWER LENGTH — DETAILED MODE: give a thorough, well-structured answer of "
+            "roughly 220-320 words. Open with a one-sentence direct answer, then expand "
+            "with context, the 'why', and a concrete example or edge case where useful. "
+            "Use short paragraphs or bullets. Do not pad, but do be genuinely complete."
         )
     return (
-        "ANSWER LENGTH: be concise — bullet points, aim ~120 words. Lead with the "
-        "direct answer; no preamble, no restating the question."
+        "ANSWER LENGTH — BRIEF MODE: answer in AT MOST 4 short bullet points (or 3 short "
+        "sentences), UNDER 90 words total. No opening sentence, no preamble, no restating "
+        "the question, no closing summary. Lead straight with the answer. If the topic is "
+        "large, give only the single most important point and stop."
     )
 
 

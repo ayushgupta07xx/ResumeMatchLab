@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { Repeat } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTheme, useResults } from "@/lib/providers";
 import { ACC, FF } from "@/lib/theme";
@@ -10,7 +11,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 const GREETING: Msg = {
   role: "assistant",
   content:
-    "Hi! I can explain what ResumeMatch does, what its numbers mean, and how to read its charts — whether or not you've run a comparison yet. Ask me anything about the product.",
+    "Hi! I can explain what ResumeMatch does — comparing two résumé versions head-to-head, or scoring one résumé against the market — what its numbers mean, and how to read its charts. Ask me anything, whether or not you've run one yet.",
 };
 
 const SUGGESTIONS = [
@@ -139,6 +140,7 @@ export function ChatWidget() {
   const { t } = useTheme();
   const { result, fitResult } = useResults();
   const pathname = usePathname();
+  const onResult = pathname === "/results" || pathname === "/fit/results";
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([GREETING]);
@@ -153,7 +155,7 @@ export function ChatWidget() {
     setHint(true);
     const id = setTimeout(() => setHint(false), 5000); // 5s dwell
     return () => clearTimeout(id);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -238,7 +240,7 @@ export function ChatWidget() {
             boxShadow: "0 8px 24px -8px rgba(0,0,0,0.6)", whiteSpace: "nowrap",
           }}
         >
-          {pathname === "/results"
+          {onResult
             ? "Ask any detail about the result here \u2192"
             : "Questions? Ask the assistant"}
         </div>
@@ -302,13 +304,19 @@ export function ChatWidget() {
             <button
               onClick={() => setMode((mo) => (mo === "brief" ? "detailed" : "brief"))}
               title="Toggle answer length"
+              className="inline-flex items-center"
               style={{
-                fontFamily: FF.body, fontSize: 11.5, color: t.muted,
-                background: "transparent", border: `1px solid ${t.border}`,
-                borderRadius: 999, padding: "3px 10px", cursor: "pointer",
-                textTransform: "capitalize", transition: "all 140ms ease",
+                gap: 6,
+                fontFamily: FF.mono, fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
+                color: t.text, background: t.accentSoft,
+                border: `1px solid ${t.border}`,
+                borderRadius: 999, padding: "5px 11px 5px 9px", cursor: "pointer",
+                textTransform: "capitalize", transition: "all 160ms ease",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = t.accentTint; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = t.accentSoft; }}
             >
+              <Repeat size={12} strokeWidth={2.4} />
               {mode}
             </button>
           </div>
@@ -380,7 +388,7 @@ export function ChatWidget() {
                   }
                 }}
                 rows={1}
-                placeholder={pathname === "/results" ? "Ask about the result…" : "Ask about ResumeMatch…"}
+                placeholder={onResult ? "Ask about the result…" : "Ask about ResumeMatch…"}
                 style={{
                   flex: 1, resize: "none", maxHeight: 96, fontFamily: FF.body, fontSize: 13.5,
                   color: t.text, background: "rgba(0,0,0,0.3)", border: `1px solid ${t.border}`,
