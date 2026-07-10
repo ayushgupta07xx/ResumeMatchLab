@@ -88,6 +88,7 @@ export default function ResultsPage() {
         </Btn>
       </div>
 
+      <ForestPlot clusters={result.clusters} />
       <div
         style={{
           display: "grid",
@@ -107,7 +108,6 @@ export default function ResultsPage() {
       </div>
 
       <MdePanel effect={effect} nJobs={result.summary.n_jobs} />
-      <ForestPlot clusters={result.clusters} />
 
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
         <ScoreDistribution dist={result.distributions} />
