@@ -141,6 +141,7 @@ export function ChatWidget() {
   const { result, fitResult } = useResults();
   const pathname = usePathname();
   const onResult = pathname === "/results" || pathname === "/fit/results";
+  const showHint = pathname === "/" || onResult;
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([GREETING]);
@@ -152,10 +153,14 @@ export function ChatWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!showHint) {
+      setHint(false);
+      return;
+    }
     setHint(true);
     const id = setTimeout(() => setHint(false), 5000); // 5s dwell
     return () => clearTimeout(id);
-  }, [pathname]);
+  }, [pathname, showHint]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
