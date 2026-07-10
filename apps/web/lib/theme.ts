@@ -30,15 +30,16 @@ export type ThemeTokens = {
   accentText: string;
   glow: string;
   cardShadow: string;
+  bgGradient: string;
 };
 
 export const THEME: Record<"dark" | "light", ThemeTokens> = {
   dark: {
     bg: "#0A0B0D",
     bg2: "#0E1014",
-    surface: "#131620",
-    surface2: "#1A1E29",
-    border: "#242A36",
+    surface: "#101319",
+    surface2: "#161A22",
+    border: "#2A313E",
     text: "#ECEEF2",
     muted: "#8A909B",
     faint: "#5A616C",
@@ -49,14 +50,15 @@ export const THEME: Record<"dark" | "light", ThemeTokens> = {
     onAccent: "#0A0B0D",
     accentText: "#AEB6C2",
     glow: "radial-gradient(58% 48% at 80% 14%, rgba(148,168,214,.16), transparent 60%), radial-gradient(96% 62% at 50% -10%, rgba(120,140,182,.08), transparent 56%), radial-gradient(42% 42% at 6% 102%, rgba(180,196,226,.05), transparent 62%)",
-    cardShadow: "inset 0 1px 0 rgba(255,255,255,.07), 0 24px 64px -30px rgba(0,0,0,.65)",
+    cardShadow: "inset 0 1px 0 rgba(255,255,255,.08), inset 0 -20px 60px -30px rgba(0,0,0,.5), 0 30px 80px -36px rgba(0,0,0,.8)",
+    bgGradient: "linear-gradient(165deg, #0D1016 0%, #0A0B0E 44%, #070808 100%)",
   },
   light: {
-    bg: "#FFFFFF",
-    bg2: "#F7F8FA",
-    surface: "#FFFFFF",
-    surface2: "#F5F6F8",
-    border: "#E7E9EE",
+    bg: "#F4F5F7",
+    bg2: "#EEF0F3",
+    surface: "#FDFDFE",
+    surface2: "#F6F7F9",
+    border: "#DCE0E6",
     text: "#15181C",
     muted: "#5B626B",
     faint: "#A6ACB5",
@@ -66,7 +68,8 @@ export const THEME: Record<"dark" | "light", ThemeTokens> = {
     accentTint: "rgba(27,30,36,.13)",
     onAccent: "#FFFFFF",
     accentText: "#4A515B",
-    glow: "radial-gradient(58% 48% at 80% 14%, rgba(44,58,92,.13), transparent 58%), radial-gradient(96% 64% at 50% -12%, rgba(28,36,58,.07), transparent 56%), radial-gradient(40% 42% at 6% 102%, rgba(40,52,84,.05), transparent 62%)",
-    cardShadow: "0 1px 2px rgba(20,24,31,.04), 0 18px 46px -22px rgba(20,24,31,.12)",
+    glow: "radial-gradient(60% 50% at 82% 10%, rgba(90,110,160,.16), transparent 60%), radial-gradient(100% 66% at 50% -14%, rgba(70,90,140,.10), transparent 58%), radial-gradient(44% 46% at 4% 104%, rgba(80,100,150,.08), transparent 64%)",
+    cardShadow: "inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(20,24,31,.04), 0 18px 44px -20px rgba(30,38,54,.16), 0 4px 12px -6px rgba(30,38,54,.08)",
+    bgGradient: "linear-gradient(180deg, #F7F8FA 0%, #F1F3F6 52%, #EAEDF1 100%)",
   },
 };

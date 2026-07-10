@@ -21,7 +21,7 @@ export function ThemedShell({ children }: { children: ReactNode }) {
           ...vars,
           position: "relative",
           isolation: "isolate",
-          background: t.bg,
+          background: t.bgGradient,
           color: t.text,
           minHeight: "100dvh",
           fontFamily: FF.body,
