@@ -3,8 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useTheme } from "@/lib/providers";
 import { FF } from "@/lib/theme";
 import { Btn } from "@/components/btn";
-import { ResultVerdict } from "@/components/result-verdict";
-import { DEMO_RESULT } from "@/lib/demo-result";
+import { VerdictCarousel } from "@/components/verdict-carousel";
 export default function Landing() {
   const { t } = useTheme();
   return (
@@ -79,7 +78,7 @@ export default function Landing() {
             </div>
             {/* right: verdict signature */}
             <div className="rise3">
-              <ResultVerdict data={DEMO_RESULT} />
+              <VerdictCarousel />
             </div>
           </div>
         </div>

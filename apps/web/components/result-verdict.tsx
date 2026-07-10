@@ -105,7 +105,7 @@ function Stat({ label, value, t, color }: { label: string; value: string; t: The
   );
 }
 
-export function ResultVerdict({ data }: { data: CompareResponse }) {
+export function ResultVerdict({ data, bare = false }: { data: CompareResponse; bare?: boolean }) {
   const { t } = useTheme();
   const { verdict, summary } = data;
   const { aWins, bWins } = winRates(summary);
@@ -117,17 +117,8 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
   const loser = winner === "A" ? "B" : "A";
   const [lo, hi] = verdict.ci_points;
 
-  return (
-    <div
-      style={{
-        position: "relative",
-        background: t.surface,
-        border: `1px solid ${t.border}`,
-        borderRadius: 18,
-        padding: "30px 32px 26px",
-        boxShadow: t.cardShadow,
-      }}
-    >
+  const inner = (
+    <>
       <div className="flex items-start justify-between" style={{ gap: 16 }}>
         <span style={{ fontFamily: FF.mono, fontSize: 10.5, letterSpacing: "0.16em", color: t.faint }}>
           VERDICT
@@ -149,7 +140,6 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
           {verdict.confidence} confidence
         </span>
       </div>
-
       {isTie ? (
         <>
           <div style={{ fontFamily: FF.display, fontSize: 30, fontWeight: 700, marginTop: 16, letterSpacing: "-0.02em" }}>
@@ -168,12 +158,10 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
           <div style={{ fontFamily: FF.display, fontSize: 24, fontWeight: 600, marginTop: 16, color: t.muted, letterSpacing: "-0.01em" }}>
             Résumé <span style={{ color: winColor, fontWeight: 700 }}>{winner}</span> is the stronger match
           </div>
-
           <div
             className="grid gap-7"
             style={{ marginTop: 18, gridTemplateColumns: "minmax(0,1fr) minmax(0,1.1fr)", alignItems: "center" }}
           >
-            {/* left: hero win-rate + connected support */}
             <div>
               <span style={{ fontFamily: FF.display, fontSize: 56, fontWeight: 800, lineHeight: 0.9, letterSpacing: "-0.03em", color: winColor }}>
                 {fmtPct(winRate)}
@@ -183,12 +171,10 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
                 {edge === null ? "" : <> · <span style={{ color: t.text }}>{fmtPct(edge)} higher</span> average match</>}
               </div>
             </div>
-            {/* right: win-share split bar (the signature) */}
             <WinShareBar aWins={aWins} bWins={bWins} t={t} />
           </div>
         </>
       )}
-
       <div style={{ height: 1, background: t.border, margin: "24px 0 16px" }} />
       <div className="flex" style={{ gap: 30, flexWrap: "wrap" }}>
         <Stat label="Δ mean" value={`${fmtPts(verdict.mean_delta_points ?? 0, 2, true)} pts`} t={t} color={winColor} />
@@ -198,6 +184,24 @@ export function ResultVerdict({ data }: { data: CompareResponse }) {
         <Stat label="p-value" value={fmtP(verdict.p_value)} t={t} />
         <Stat label="Cohen's d" value={fmtPts(verdict.cohens_d ?? 0)} t={t} />
       </div>
+    </>
+  );
+
+  if (bare) return inner;
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        background: t.surface,
+        border: `1px solid ${isTie ? t.border : winColor + "88"}`,
+        borderRadius: 18,
+        padding: "30px 32px 26px",
+        boxShadow: t.cardShadow,
+        transition: "border-color 700ms ease, box-shadow 700ms ease",
+      }}
+    >
+      {inner}
     </div>
   );
 }
