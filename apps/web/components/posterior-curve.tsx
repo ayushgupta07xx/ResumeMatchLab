@@ -11,15 +11,21 @@ export function PosteriorCurve({ bayes }: { bayes: Bayes }) {
   const data = bayes.posterior_curve.map((d) => ({ p: d.p, density: d.density }));
   const [lo, hi] = bayes.credible_interval;
   const pBeats = (bayes.prob_b_beats_a ?? 0) * 100;
+  const mean = (bayes.posterior_mean ?? 0) * 100;
+  const majority = pBeats < 0.1 ? "<0.1%" : fmtPct(pBeats);
 
   return (
     <div style={{ background: "transparent", border: `1px solid var(--accent)`, borderRadius: 16, padding: 20 }}>
       <h3 style={{ fontFamily: FF.display, fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
         Bayesian posterior — share of jobs B wins
       </h3>
-      <p style={{ fontSize: 13, color: t.muted, margin: "6px 0 0" }}>
-        Probability B wins more than half the jobs:{" "}
-        <span style={{ fontFamily: FF.mono, color: t.text }}>{fmtPct(pBeats)}</span>.
+      <p style={{ fontSize: 13, color: t.muted, margin: "6px 0 0", lineHeight: 1.5 }}>
+        Most likely B wins{" "}
+        <span style={{ fontFamily: FF.mono, color: t.text }}>{fmtPct(mean)}</span>{" "}
+        of jobs{lo !== null && hi !== null ? (
+          <> (95% credible <span style={{ fontFamily: FF.mono, color: t.text }}>{fmtPct(lo * 100)}–{fmtPct(hi * 100)}</span>)</>
+        ) : null}. Chance B wins a majority:{" "}
+        <span style={{ fontFamily: FF.mono, color: t.text }}>{majority}</span>.
       </p>
       <div style={{ height: 230, width: "100%", marginTop: 14 }}>
         <ResponsiveContainer>

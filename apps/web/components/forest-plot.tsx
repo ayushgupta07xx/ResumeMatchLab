@@ -1,28 +1,14 @@
 "use client";
 import { Btn } from "@/components/btn";
-
-import {
-  Bar,
-  BarChart,
-  Cell,
-  ErrorBar,
-  LabelList,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import type { LabelProps } from "recharts";
 import type { ClusterRow } from "@/lib/types";
 import { useTheme } from "@/lib/providers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { A, B, FF, type ThemeTokens } from "@/lib/theme";
 
 function Card({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle: string }) {
   const { t } = useTheme();
   return (
-    <div style={{ background: "transparent", border: `1px solid var(--accent)`, borderRadius: 16, padding: 20 }}>
+    <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: 16, padding: 20, boxShadow: t.cardShadow }}>
       <h3 style={{ fontFamily: FF.display, fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
         {title}
       </h3>
@@ -36,6 +22,13 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
   const { t } = useTheme();
   const [selected, setSelected] = useState<ClusterRow | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const rows = [...clusters]
     .filter((c) => c.mean_delta !== null)
     .sort((a, b) => (a.mean_delta ?? 0) - (b.mean_delta ?? 0))
@@ -44,107 +37,124 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
       const lo = (c.ci_low ?? 0) * 100;
       const hi = (c.ci_high ?? 0) * 100;
       const color = c.winner === "A" ? A : c.winner === "B" ? B : t.faint;
-      return { label: c.label, x, err: [x - lo, hi - x] as [number, number], color, row: c };
+      return { label: c.label, x, lo, hi, color, row: c };
     });
+
+  // Symmetric domain so zero stays centered; fit the widest bar or whisker.
+  const maxAbs = Math.max(
+    0.5,
+    ...rows.map((r) => Math.max(Math.abs(r.x), Math.abs(r.lo), Math.abs(r.hi))),
+  );
+  const dom = maxAbs * 1.08; // small padding so extremes don't touch the edge
+
+  // Geometry (SVG user units == px via viewBox width match).
+  const GUTTER = 196; // left label column
+  const VALCOL = 52; // right value column
+  const ROW_H = 32;
+  const BAR_H = 13;
+  const W = 720; // viewBox width
+  const plotL = GUTTER;
+  const plotR = W - VALCOL;
+  const plotW = plotR - plotL;
+  const cx = plotL + plotW / 2; // zero spine x
+  const H = rows.length * ROW_H + 8;
+
+  // value -> x pixel
+  const px = (v: number) => cx + (v / dom) * (plotW / 2);
 
   return (
     <Card
       title="Where each résumé matches better — by job cluster"
-      subtitle="Average score gap per cluster (percentage points), with 95% bootstrap intervals."
+      subtitle="Average score gap per cluster (percentage points), with 95% bootstrap intervals. Click a row for the skills that separate them."
     >
       {selected ? (
         <DiffPanel row={selected} onBack={() => setSelected(null)} t={t} />
       ) : (
-      <>
-      <div style={{ height: 360, width: "100%", marginTop: 14 }}>
-        <ResponsiveContainer>
-          <BarChart layout="vertical" data={rows} margin={{ top: 8, right: 28, bottom: 8, left: 8 }}>
-            <XAxis
-              type="number"
-              tick={{ fontSize: 11, fill: t.muted, fontFamily: FF.mono }}
-              tickFormatter={(v) => Number(v).toFixed(0)}
-              stroke={t.border}
-            />
-            <YAxis
-              type="category"
-              dataKey="label"
-              width={156}
-              tick={{ fontSize: 12, fill: t.text }}
-              stroke={t.border}
-            />
-            <ReferenceLine x={0} stroke={t.faint} strokeDasharray="3 3" />
-            <Tooltip
-              cursor={{ fill: t.surface2, opacity: 0.5 }}
-              contentStyle={{
-                background: t.surface,
-                border: `1px solid ${t.border}`,
-                borderRadius: 8,
-                fontSize: 12,
-                color: t.text,
-                fontFamily: FF.mono,
-              }}
-              labelStyle={{ color: t.text }}
-              itemStyle={{ color: t.text }}
-              formatter={(v) => [`${Number(v).toFixed(2)} pts`, "Δ (B − A)"]}
-            />
-            <Bar
-              dataKey="x"
-              radius={2}
-              isAnimationActive={false}
-              cursor="pointer"
-              onClick={(d: { payload?: { row?: ClusterRow } }) => setSelected(d?.payload?.row ?? null)}
-              onMouseEnter={(_: unknown, i: number) => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              <LabelList
-                dataKey="x"
-                content={(props: LabelProps) => {
-                  const x = Number(props.x ?? 0);
-                  const y = Number(props.y ?? 0);
-                  const width = Number(props.width ?? 0);
-                  const height = Number(props.height ?? 0);
-                  const index = props.index;
-                  const viewBox = props.viewBox as { x?: number; width?: number } | undefined;
-                  if (index !== hovered) return null;
-                  const label = "(click to see details)";
-                  const px = 6.2 * label.length; // approx text width at 10.5px mono
-                  const barEnd = x + width; // right end for +bars, left end for -bars
-                  const rightEdge = (viewBox?.x ?? 0) + (viewBox?.width ?? 9999);
-                  const leftEdge = viewBox?.x ?? 0;
-                  let tx: number;
-                  let anchor: "start" | "end";
-                  let inside = false;
-                  if (width >= 0) {
-                    if (barEnd + 8 + px <= rightEdge) { tx = barEnd + 8; anchor = "start"; }
-                    else { tx = barEnd - 8; anchor = "end"; inside = true; }
-                  } else {
-                    if (barEnd - 8 - px >= leftEdge) { tx = barEnd - 8; anchor = "end"; }
-                    else { tx = barEnd + 8; anchor = "start"; inside = true; }
-                  }
-                  return (
-                    <text x={tx} y={y + height / 2} dy={3} textAnchor={anchor}
-                      style={{ fontFamily: FF.mono, fontSize: 10.5, fill: inside ? t.text : t.muted, letterSpacing: "0.02em" }}>
-                      {label}
+        <>
+          <style>{`
+            @media (prefers-reduced-motion: reduce) {
+              .fp-bar { transition: none !important; }
+            }
+          `}</style>
+          <div style={{ width: "100%", marginTop: 16, overflow: "hidden" }}>
+            <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Per-cluster score gap forest plot">
+              {/* zero spine */}
+              <line x1={cx} y1={2} x2={cx} y2={H - 2} stroke={t.text} strokeOpacity={0.32} strokeWidth={1} />
+
+              {rows.map((r, i) => {
+                const cy = i * ROW_H + ROW_H / 2 + 2;
+                const isHover = hovered === i;
+                const dim = hovered !== null && !isHover;
+                const barX = Math.min(cx, px(r.x));
+                const barW = Math.abs(px(r.x) - cx);
+                const loX = px(r.lo);
+                const hiX = px(r.hi);
+                return (
+                  <g
+                    key={i}
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                    onClick={() => setSelected(r.row)}
+                  >
+                    {/* row hover background */}
+                    <rect
+                      x={0} y={cy - ROW_H / 2} width={W} height={ROW_H}
+                      fill={isHover ? t.text : "transparent"} fillOpacity={isHover ? 0.04 : 0}
+                    />
+                    {/* label */}
+                    <text
+                      x={GUTTER - 14} y={cy} dy={4} textAnchor="end"
+                      style={{ fontFamily: FF.body, fontSize: 12.5, fill: t.text, fillOpacity: dim ? 0.5 : 1 }}
+                    >
+                      {r.label}
                     </text>
-                  );
-                }}
-              />
-              {rows.map((r, i) => (
-                <Cell key={i} fill={r.color} fillOpacity={hovered === null || hovered === i ? 1 : 0.45} />
-              ))}
-              <ErrorBar dataKey="err" direction="x" width={4} strokeWidth={1.2} stroke={t.faint} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div
-        className="flex items-center justify-between"
-        style={{ fontFamily: FF.mono, fontSize: 10, color: t.faint, marginTop: 6, letterSpacing: "0.04em" }}
-      >
-        <span>{"\u25C0"} Résumé A matches better</span>
-        <span>Résumé B matches better {"\u25B6"}</span>
-      </div>
-      </>
+                    {/* CI whisker (hairline + caps) */}
+                    <line x1={loX} y1={cy} x2={hiX} y2={cy} stroke={t.faint} strokeWidth={1} strokeOpacity={dim ? 0.4 : 1} />
+                    <line x1={loX} y1={cy - 4} x2={loX} y2={cy + 4} stroke={t.faint} strokeWidth={1} strokeOpacity={dim ? 0.4 : 1} />
+                    <line x1={hiX} y1={cy - 4} x2={hiX} y2={cy + 4} stroke={t.faint} strokeWidth={1} strokeOpacity={dim ? 0.4 : 1} />
+                    {/* bar — grows from spine on mount */}
+                    <rect
+                      className="fp-bar"
+                      x={barX} y={cy - BAR_H / 2}
+                      width={barW} height={BAR_H} rx={2}
+                      fill={r.color} fillOpacity={dim ? 0.4 : isHover ? 1 : 0.85}
+                      style={{
+                        transformBox: "fill-box",
+                        transformOrigin: r.x >= 0 ? "left center" : "right center",
+                        transform: mounted ? "scaleX(1)" : "scaleX(0)",
+                        transition: `transform 520ms cubic-bezier(0.22,1,0.36,1) ${i * 32}ms`,
+                      }}
+                    />
+                    {/* value */}
+                    <text
+                      x={W - 8} y={cy} dy={4} textAnchor="end"
+                      style={{ fontFamily: FF.mono, fontSize: 12, fill: r.color, fillOpacity: dim ? 0.5 : 1 }}
+                    >
+                      {r.x >= 0 ? "+" : "\u2212"}{Math.abs(r.x).toFixed(2)}
+                    </text>
+                    {/* hover chevron */}
+                    {isHover && (
+                      <text
+                        x={GUTTER - 4} y={cy} dy={4} textAnchor="middle"
+                        style={{ fontFamily: FF.mono, fontSize: 11, fill: t.muted }}
+                      >
+                        {"\u203A"}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+          <div
+            className="flex items-center justify-between"
+            style={{ fontFamily: FF.mono, fontSize: 10, color: t.faint, marginTop: 8, letterSpacing: "0.04em" }}
+          >
+            <span>{"\u25C0"} Résumé A matches better</span>
+            <span>Résumé B matches better {"\u25B6"}</span>
+          </div>
+        </>
       )}
     </Card>
   );
