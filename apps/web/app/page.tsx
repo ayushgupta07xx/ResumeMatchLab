@@ -3,11 +3,12 @@ import { ArrowRight } from "lucide-react";
 import { useTheme } from "@/lib/providers";
 import { FF } from "@/lib/theme";
 import { Btn } from "@/components/btn";
-import { ExampleVerdict } from "@/components/example-verdict";
+import { ResultVerdict } from "@/components/result-verdict";
+import { DEMO_RESULT } from "@/lib/demo-result";
 export default function Landing() {
   const { t } = useTheme();
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "calc(100dvh - 69px)" }}>
       {/* hero — two columns: thesis left, verdict right */}
       <header style={{ position: "relative", overflow: "hidden" }}>
         <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto", padding: "72px 28px 76px" }}>
@@ -72,19 +73,23 @@ export default function Landing() {
                     padding: "14px 12px",
                   }}
                 >
-                  How it works
+                  Methodology
                 </Btn>
               </div>
             </div>
             {/* right: verdict signature */}
             <div className="rise3">
-              <ExampleVerdict />
+              <ResultVerdict data={DEMO_RESULT} />
             </div>
           </div>
         </div>
       </header>
+
+      {/* spacer — hero owns the screen, footer sits at the bottom */}
+      <div style={{ flex: 1 }} />
+
       {/* footer */}
-      <footer style={{ borderTop: `1px solid ${t.border}`, marginTop: 8 }}>
+      <footer style={{ borderTop: `1px solid ${t.border}` }}>
         <div
           className="flex items-center justify-between"
           style={{ maxWidth: 1180, margin: "0 auto", padding: "26px 28px 40px", flexWrap: "wrap", gap: 12 }}
@@ -102,6 +107,6 @@ export default function Landing() {
           </span>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
