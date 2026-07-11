@@ -101,3 +101,22 @@
     animation: pageEnter 0.7s var(--ease-out) both;
   }
 }
+
+.rm-fab-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+.rm-fab-icon.rm-fab-on {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rm-fab-icon {
+    transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+  }
+}

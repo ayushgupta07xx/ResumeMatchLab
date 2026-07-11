@@ -262,15 +262,16 @@ export function ChatWidget() {
           boxShadow: "0 10px 30px -10px rgba(0,0,0,0.35)",
         }}
       >
-        {open ? (
+        <span className={open ? "rm-fab-icon rm-fab-on" : "rm-fab-icon"} aria-hidden={!open}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
-        ) : (
+        </span>
+        <span className={open ? "rm-fab-icon" : "rm-fab-icon rm-fab-on"} aria-hidden={open}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6a8.5 8.5 0 0 1-.9-3.9 8.38 8.38 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8.5z" />
           </svg>
-        )}
+        </span>
       </button>
 
         <div
