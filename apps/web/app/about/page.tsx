@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Logo } from "@/components/logo";
 import { useTheme } from "@/lib/providers";
 import { FF, type ThemeTokens } from "@/lib/theme";
 
@@ -176,7 +177,10 @@ export default function AboutPage() {
           className="flex items-center justify-between"
           style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 28px", flexWrap: "wrap", gap: 12, fontFamily: FF.mono, fontSize: 12, color: t.faint }}
         >
-          <span>ResumeMatch Lab</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+            <Logo size={15} />
+            ResumeMatch Lab
+          </span>
           <span>&copy; 2026 &middot; Processed in-memory &middot; Never stored</span>
         </div>
       </footer>

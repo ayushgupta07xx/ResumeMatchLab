@@ -48,7 +48,7 @@ export function ForestPlot({ clusters }: { clusters: ClusterRow[] }) {
   const dom = maxAbs * 1.08; // small padding so extremes don't touch the edge
 
   // Geometry (SVG user units == px via viewBox width match).
-  const GUTTER = 196; // left label column
+  const GUTTER = 248; // left label column (fits longest cluster name)
   const VALCOL = 52; // right value column
   const ROW_H = 32;
   const BAR_H = 13;

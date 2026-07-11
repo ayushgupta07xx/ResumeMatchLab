@@ -71,7 +71,7 @@ export function FitBars({
     }));
 
   // Geometry — mirrors the forest plot's gutter/value columns.
-  const GUTTER = 196;
+  const GUTTER = 248; // fits longest cluster name
   const VALCOL = 44;
   const ROW_H = 32;
   const BAR_H = 14;

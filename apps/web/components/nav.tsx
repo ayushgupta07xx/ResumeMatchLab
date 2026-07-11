@@ -3,7 +3,8 @@ import { Btn } from "@/components/btn";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { useTheme } from "@/lib/providers";
 import { FF } from "@/lib/theme";
 
@@ -32,7 +33,7 @@ export function Nav() {
           className="flex items-center"
           style={{ gap: 9, textDecoration: "none", color: "inherit" }}
         >
-          <FileText size={18} strokeWidth={2.2} color={t.text} />
+          <Logo size={20} />
           <span style={{ fontFamily: FF.display, fontWeight: 700, fontSize: 15.5, letterSpacing: "-0.01em" }}>
             ResumeMatch Lab
           </span>
