@@ -24,3 +24,8 @@ Thumbs.db
 
 # NOTE: data/jobs_snapshot/*.parquet and embeddings/*.parquet are committed on
 # purpose — the pre-built snapshot IS the product and keeps the app offline.
+
+# demo video masters (gif is committed + served; mp4 lives on YouTube)
+docs/videos/resumematch-lab-demo.mp4
+docs/videos/demo-poster.png
+docs/videos/demo-poster.jpg

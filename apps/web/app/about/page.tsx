@@ -106,66 +106,70 @@ export default function AboutPage() {
             letterSpacing: "-0.03em",
             lineHeight: 1.04,
             margin: "0 0 24px",
-            maxWidth: 760,
+            maxWidth: 560,
           }}
         >
           Proof, not opinion, on which r&eacute;sum&eacute; wins.
         </h1>
 
-        <p style={{ fontSize: 16.5, lineHeight: 1.7, color: t.muted, margin: "0 0 44px", maxWidth: 620 }}>
-          ResumeMatch Lab scores two versions of a r&eacute;sum&eacute; against 9,014 live Indian tech
-          jobs by semantic similarity &mdash; matching on what the work involves, not shared keywords
-          &mdash; then runs a full statistical pipeline (bootstrap confidence intervals, significance
-          tests, variance reduction, per-cluster breakdown) to say which version matches the market
-          better and where. R&eacute;sum&eacute;s are read in memory and never stored. It runs on a
-          free, open stack and is built and maintained by{" "}
-          <span style={{ color: t.text, fontWeight: 700 }}>Ayush Gupta</span>.
-        </p>
-
+        <div
+          style={{
+            display: "flex",
+            gap: 32,
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            margin: "0 0 40px",
+          }}
+        >
+          <div
+            style={{
+              flex: "1 1 0",
+              minWidth: 280,
+              fontSize: 16.5,
+              lineHeight: 1.75,
+              color: t.muted,
+            }}
+          >
+            <p style={{ margin: 0 }}>
+              ResumeMatch Lab scores two versions of a r&eacute;sum&eacute; against 9,014 live Indian
+              tech jobs by semantic similarity &mdash; matching on what the work actually involves,
+              not shared keywords &mdash; then runs a full statistical pipeline to say which version
+              matches the market better, and where.
+            </p>
+            <p style={{ margin: "16px 0 0" }}>
+              It breaks the verdict down cluster by cluster with confidence intervals and effect
+              sizes, and can also score a single r&eacute;sum&eacute; on its own &mdash; a percentile
+              fit against the market. R&eacute;sum&eacute;s are read in memory and never stored, and
+              it is built and maintained by{" "}
+              <span style={{ color: t.text, fontWeight: 700 }}>Ayush Gupta</span>.
+            </p>
+          </div>
+          <div
+            style={{
+              flex: "0 0 500px",
+              maxWidth: "100%",
+              minWidth: 280,
+              position: "relative",
+              border: `1px solid var(--accent)`,
+              borderRadius: 18,
+              overflow: "hidden",
+              background: t.surface2,
+              aspectRatio: "16 / 9",
+            }}
+          >
+            <img
+              src="/demo.gif"
+              alt=""
+              loading="lazy"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </div>
+        </div>
         <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 40 }}>
           {STATS.map((s) => (
             <StatCard key={s.label} n={s.n} label={s.label} t={t} />
           ))}
         </div>
-
-        <div
-          style={{
-            position: "relative",
-            border: `1px solid var(--accent)`,
-            borderRadius: 18,
-            overflow: "hidden",
-            background: t.surface2,
-            aspectRatio: "16 / 8",
-            marginBottom: 32,
-          }}
-        >
-          <video
-            src="/demo.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              pointerEvents: "none",
-            }}
-          >
-            <div style={{ fontFamily: FF.mono, fontSize: 11, letterSpacing: "0.18em", color: t.faint }}>
-              PRODUCT DEMO
-            </div>
-            <div style={{ fontSize: 13, color: t.faint }}>Walkthrough video coming soon</div>
-          </div>
-        </div>
-
         <div className="flex items-center" style={{ gap: 12 }}>
           <LinkButton href="https://github.com/ayushgupta07xx" icon={<GithubIcon />} label="GitHub" t={t} />
           <LinkButton href="https://linkedin.com/in/ayush-gupta-544a803a2" icon={<LinkedinIcon />} label="LinkedIn" t={t} />
