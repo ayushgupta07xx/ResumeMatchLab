@@ -24,11 +24,11 @@
 
 <br/>
 
-[![Watch ResumeMatch Lab in action](apps/web/public/demo.gif)](https://youtu.be/zcAOFmiSpKs)
+[![ResumeMatch Lab](docs/images/logo-mark-512.png)](https://youtu.be/zcAOFmiSpKs)
 
 [![Watch the full demo](https://img.shields.io/badge/▶_Watch_the_full_demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/zcAOFmiSpKs)
 
-🌐 **[Web app](https://resumematch-lab.vercel.app)** · 📊 **[Analyst app](https://resumematchlab.streamlit.app)** · 🛠 **[API](https://huggingface.co/spaces/ayushgupta7777/resumematch-api)**
+🌐 **[Web app](https://resumematch-lab.vercel.app)** · 📊 **[Streamlit](https://resumematchlab.streamlit.app)** · 🛠 **[API](https://huggingface.co/spaces/ayushgupta7777/resumematch-api)**
 
 </div>
 
@@ -43,7 +43,7 @@ ResumeMatch Lab treats that as a designed experiment, not a vibe check. It embed
 |   | What | Link |
 |---|---|---|
 | 🌐 | **Web app** | The full product — upload two résumés, get the verdict, forest plot, and the assistant · **[resumematch-lab.vercel.app](https://resumematch-lab.vercel.app)** |
-| 📊 | **Analyst app** | The Streamlit surface — the same engine, a statistician's view of every test · **[resumematchlab.streamlit.app](https://resumematchlab.streamlit.app)** |
+| 📊 | **Streamlit** | The Streamlit surface — the same engine, a statistician's view of every test · **[resumematchlab.streamlit.app](https://resumematchlab.streamlit.app)** |
 | 🛠 | **Live API** | FastAPI service — `/compare`, `/fit`, `/chat` · **[…hf.space](https://huggingface.co/spaces/ayushgupta7777/resumematch-api)** |
 
 ## What it does
