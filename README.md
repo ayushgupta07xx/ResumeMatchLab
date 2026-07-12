@@ -1,6 +1,8 @@
 <div align="center">
 
-# 📄 ResumeMatch Lab
+<img src="docs/images/logo-mark-512.png" width="76" alt="ResumeMatch Lab logo" />
+
+# ResumeMatch Lab
 
 ### A/B test two résumé versions against the live Indian tech job market — which one wins, by how much, and where. Free to run, **₹0/month**.
 
@@ -45,6 +47,12 @@ ResumeMatch Lab treats that as a designed experiment, not a vibe check. It embed
 | 🌐 | **Web app** | The full product — upload two résumés, get the verdict, forest plot, and the assistant · **[resumematch-lab.vercel.app](https://resumematch-lab.vercel.app)** |
 | 📊 | **Streamlit** | The Streamlit surface — the same engine, a statistician's view of every test · **[resumematchlab.streamlit.app](https://resumematchlab.streamlit.app)** |
 | 🛠 | **Live API** | FastAPI service — `/compare`, `/fit`, `/chat` · **[…hf.space](https://huggingface.co/spaces/ayushgupta7777/resumematch-api)** |
+
+## See it in the product
+
+The web app — compare two résumés head-to-head, read the verdict and the per-cluster forest plot, and ask the grounded assistant about any number.
+
+![ResumeMatch Lab web app](docs/images/homepage.png)
 
 ## What it does
 
