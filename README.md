@@ -24,7 +24,7 @@
 
 <br/>
 
-[![ResumeMatch Lab](docs/images/logo-mark-512.png)](https://youtu.be/zcAOFmiSpKs)
+<a href="https://youtu.be/zcAOFmiSpKs"><img width="720" alt="ResumeMatch Lab demo" src="https://github.com/user-attachments/assets/3dbd262d-9d4e-41f9-8ba3-b702aaca4d1c" /></a>
 
 [![Watch the full demo](https://img.shields.io/badge/▶_Watch_the_full_demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/zcAOFmiSpKs)
 
