@@ -26,7 +26,7 @@
 
 <br/>
 
-<a href="https://youtu.be/zcAOFmiSpKs"><img width="720" alt="ResumeMatch Lab demo" src="https://github.com/user-attachments/assets/3dbd262d-9d4e-41f9-8ba3-b702aaca4d1c" /></a>
+<a href="https://youtu.be/zcAOFmiSpKs"><img width="720" alt="ResumeMatch Lab demo" src="https://github.com/user-attachments/assets/4828e27f-41e4-4b49-805e-9597df7a1ad3" /></a>
 
 [![Watch the full demo](https://img.shields.io/badge/▶_Watch_the_full_demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/zcAOFmiSpKs)
 
